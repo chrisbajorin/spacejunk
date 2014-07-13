@@ -1,0 +1,93 @@
+<script>
+  $(function(){
+
+    var width = 960,
+        height = 800;
+
+    // MAIN GLOBE
+    var projection = d3.geo.orthographic()
+        .scale((height-100)/2)
+        .translate([width / 2, height / 2])
+        .clipAngle(90);
+
+    var path = d3.geo.path()
+        .projection(projection)
+        // .pointRadius(1.5);
+
+    var cities = d3.geo.path()
+        .projection(projection)
+        .pointRadius(1.5);
+
+
+    // SATELLITE GLOBE
+    // var satProjection = d3.geo.orthographic()
+    //     .scale((height-10)/2)
+    //     .translate(([width/2,height/2]))
+
+    // var satPath = d3.geo.path()
+    //     .projection(satProjection);
+
+    // x-revolution
+    var λ = d3.scale.linear()
+        .domain([0, width])
+        .range([-180, 180]);
+
+    // // y-revolution
+    // var φ = d3.scale.linear()
+    //     .domain([0, height])
+    //     .range([90, -90]);
+
+
+    var svg = d3.select("body").append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+    var graticule = d3.geo.graticule();
+
+
+
+    svg.append("path")
+        .datum(graticule)
+        .attr("class", "graticule")
+        .attr("d", path);
+
+
+    svg.on("mousemove", function() {
+      var p = d3.mouse(this);
+      // satProjection.rotate([λ(p[0]), 0])
+      projection.rotate([λ(p[0]), 0]);
+      svg.selectAll(".globe").attr("d", path);
+      svg.selectAll("circle").attr("transform", function(d) { return "translate(" + projection(d) + ")"})
+      // svg.selectAll(".land").attr("d", satPath)
+    });
+
+
+  d3.json("world.json", function(error, world) {
+
+    svg.append("path")
+        .datum(topojson.feature(world, world.objects.ocean))
+        .attr("class", "globe")
+        .attr("id", "ocean")
+        .attr("d", path);
+
+    svg.append("path")
+        .datum(topojson.feature(world, world.objects.land))
+        .attr("class", "globe")
+        .attr("id", "land")
+        .attr("d", path)
+
+    // var g = svg.selectAll("circle")
+    //     .data(data)
+    //     .enter()
+    //     .append("circle")
+    //     .attr("r", 5)
+    //     .attr("transform", function(d) { return "translate(" + projection(d) + ")"})
+
+  });
+
+  // d3.json("countries.json", function(error, countries) {
+  //   console.log(countries)
+  // })
+
+  })
+</script>
