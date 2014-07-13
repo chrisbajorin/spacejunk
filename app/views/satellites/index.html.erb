@@ -1,6 +1,11 @@
 <script>
   $(function(){
 
+
+    function getTop(datum) {
+      return projection(datum)
+    }
+
     var width = 960,
         height = 800;
 
@@ -12,20 +17,17 @@
 
     var path = d3.geo.path()
         .projection(projection)
-        // .pointRadius(1.5);
-
-    var cities = d3.geo.path()
-        .projection(projection)
-        .pointRadius(1.5);
-
+        // .pointRadius(function(d) { return d.radius });
 
     // SATELLITE GLOBE
-    // var satProjection = d3.geo.orthographic()
-    //     .scale((height-10)/2)
-    //     .translate(([width/2,height/2]))
+    var satProjection = d3.geo.orthographic()
+        .scale((height-10)/2)
+        .translate(([width/2,height/2]))
+        .clipAngle(118)
 
-    // var satPath = d3.geo.path()
-    //     .projection(satProjection);
+    var satPath = d3.geo.path()
+        .projection(satProjection)
+        .pointRadius(function(d) { return d.radius });
 
     // x-revolution
     var λ = d3.scale.linear()
@@ -42,24 +44,22 @@
         .attr("width", width)
         .attr("height", height);
 
-    var graticule = d3.geo.graticule();
+    // var graticule = d3.geo.graticule();
 
-
-
-    svg.append("path")
-        .datum(graticule)
-        .attr("class", "graticule")
-        .attr("d", path);
+    // svg.append("path")
+    //     .datum(graticule)
+    //     .attr("class", "graticule")
+    //     .attr("d", path);
 
 
     svg.on("mousemove", function() {
       var p = d3.mouse(this);
-      // satProjection.rotate([λ(p[0]), 0])
+      satProjection.rotate([λ(p[0]), 0])
       projection.rotate([λ(p[0]), 0]);
       svg.selectAll(".globe").attr("d", path);
-      svg.selectAll("circle").attr("transform", function(d) { return "translate(" + projection(d) + ")"})
-      // svg.selectAll(".land").attr("d", satPath)
+      svg.selectAll(".point").attr("d", satPath);
     });
+
 
 
   d3.json("world.json", function(error, world) {
@@ -76,12 +76,20 @@
         .attr("id", "land")
         .attr("d", path)
 
-    // var g = svg.selectAll("circle")
-    //     .data(data)
-    //     .enter()
-    //     .append("circle")
-    //     .attr("r", 5)
-    //     .attr("transform", function(d) { return "translate(" + projection(d) + ")"})
+    var data = [[0,0], [10,10]]
+
+    svg.selectAll("path.point")
+    .data(data)
+    .enter()
+    .append("path")
+    .datum(function(d) {
+      return {"type": "Point", "coordinates": d, "radius": 3};
+    })
+    .attr("class", "point")
+    .attr("d", satPath)
+
+
+
 
   });
 
