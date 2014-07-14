@@ -1,11 +1,6 @@
 <script>
   $(function(){
 
-
-    function getTop(datum) {
-      return projection(datum)
-    }
-
     var width = 960,
         height = 800;
 
@@ -54,13 +49,11 @@
 
     svg.on("mousemove", function() {
       var p = d3.mouse(this);
-      satProjection.rotate([λ(p[0]), 0])
+      satProjection.rotate([λ(p[0]), 0]);
       projection.rotate([λ(p[0]), 0]);
       svg.selectAll(".globe").attr("d", path);
       svg.selectAll(".point").attr("d", satPath);
     });
-
-
 
   d3.json("world.json", function(error, world) {
 
@@ -74,28 +67,20 @@
         .datum(topojson.feature(world, world.objects.land))
         .attr("class", "globe")
         .attr("id", "land")
-        .attr("d", path)
+        .attr("d", path);
 
-    var data = [[0,0], [10,10]]
+    var data = [[0,0], [10,10], [15,-20], [50,-40], [-100, 25]];
 
     svg.selectAll("path.point")
-    .data(data)
-    .enter()
-    .append("path")
-    .datum(function(d) {
-      return {"type": "Point", "coordinates": d, "radius": 3};
-    })
-    .attr("class", "point")
-    .attr("d", satPath)
-
-
-
-
+      .data(data)
+      .enter()
+      .append("path")
+      .datum(function(d) {
+        return {"type": "Point", "coordinates": d, "radius": 3};
+      })
+      .attr("class", "point")
+      .attr("d", satPath);
   });
 
-  // d3.json("countries.json", function(error, countries) {
-  //   console.log(countries)
-  // })
-
-  })
+})
 </script>

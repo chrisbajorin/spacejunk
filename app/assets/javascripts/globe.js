@@ -5,3 +5,26 @@
 //   });
 
 // }
+
+
+
+
+
+//// potential physics
+
+
+var rAsc,
+    lmst,
+    decl,
+    hAngle,
+    sinDec,
+    cosDec,
+    cosHA
+    rR,
+    gam;
+
+sinDec = Math.sin(decl);
+cosDec = Math.cos(decl);
+cosHA = Math.cos(hAngle);
+rR = Math.sqrt((cosHA * cosDec) * (cosHA * cosDec) + (sinDec * sinDec))
+
