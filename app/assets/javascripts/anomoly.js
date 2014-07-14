@@ -1,4 +1,7 @@
 // ANGLE OF ANOMOLY CALCULATION
+// dp, decimal places is fixed at 4 from TLE data,
+// but want more specificity in the result
+var dp = 10;
 
 function EccAnom(ec,m,dp) {
 

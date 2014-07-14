@@ -15,16 +15,31 @@
 
 var rAsc,
     lmst,
-    decl,
+    dec,
     hAngle,
     sinDec,
     cosDec,
-    cosHA
+    cosHA,
+    aA,
+    bB,
     rR,
-    gam;
+    alpha;
 
-sinDec = Math.sin(decl);
-cosDec = Math.cos(decl);
+sinDec = Math.sin(dec);
+cosDec = Math.cos(dec);
 cosHA = Math.cos(hAngle);
-rR = Math.sqrt((cosHA * cosDec) * (cosHA * cosDec) + (sinDec * sinDec))
 
+aA = cosDec*cosHA;
+bB = cosDec;
+rR = Math.sqrt((aA*aA)+(bB*bB));
+
+// all equal
+alpha = Math.acos(aA/rR)
+gam2 = Math.asin(bB/rR)
+gam3 = Math.atan(bB/aA)
+
+//
+
+// rR * cos(x - gam) = 1
+// cos(x-gam) = 1/rR
+// cos()
