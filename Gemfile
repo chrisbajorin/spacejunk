@@ -28,7 +28,7 @@ gem 'pry-rails'
 gem 'rspec-rails'
 gem 'shoulda-matchers'
 gem 'factory_girl_rails'
-gem 'awesome_print'
+# gem 'awesome_print'
 
 
 # Use ActiveModel has_secure_password

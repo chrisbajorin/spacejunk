@@ -3,7 +3,7 @@ class CreateSatellite < ActiveRecord::Migration
     create_table :satellites do |t|
       t.string :norad_id
       t.date :launch_date
-      t.datetime :epoch_date
+      t.float :epoch_date
       t.float :b_star
       t.float :inclination
       t.float :right_asc
@@ -15,3 +15,4 @@ class CreateSatellite < ActiveRecord::Migration
 
     end
   end
+end

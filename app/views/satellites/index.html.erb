@@ -1,4 +1,7 @@
 <script>
+
+var satellites = <%= @satellites.to_json.html_safe %>
+
   $(function(){
 
     var width = 960,
@@ -11,18 +14,17 @@
         .clipAngle(90);
 
     var path = d3.geo.path()
-        .projection(projection)
-        // .pointRadius(function(d) { return d.radius });
+        .projection(projection);
 
     // SATELLITE GLOBE
     var satProjection = d3.geo.orthographic()
         .scale((height-10)/2)
         .translate(([width/2,height/2]))
-        .clipAngle(118)
+        .clipAngle(118);
 
     var satPath = d3.geo.path()
         .projection(satProjection)
-        .pointRadius(function(d) { return d.radius });
+        .pointRadius(3);
 
     // x-revolution
     var λ = d3.scale.linear()
@@ -38,13 +40,6 @@
     var svg = d3.select("body").append("svg")
         .attr("width", width)
         .attr("height", height);
-
-    // var graticule = d3.geo.graticule();
-
-    // svg.append("path")
-    //     .datum(graticule)
-    //     .attr("class", "graticule")
-    //     .attr("d", path);
 
 
     svg.on("mousemove", function() {

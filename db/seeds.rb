@@ -1,5 +1,6 @@
 require 'date'
 require 'time'
+Satellite.destroy_all
 
 # read csv in future
 
@@ -217,12 +218,10 @@ tle_line_array.each do |tle|
   else
     epoch_year = tle[0][18..19].to_i + 2000
   end
-  epoch_y_day = tle[0][20..22].to_i                             # day of year
-  epoch_y_date = epoch_year.to_s + "-" + epoch_y_day.to_s       # year-day
-  epoch_date = Date.strptime(epoch_y_date, "%Y-%j").to_s        # year-MM-DD
-  day_seconds = ((("0" + tle[0][23..31]).to_f)*86400).floor    # remainder seconds
-  epoch_time = Time.at(day_seconds).utc.strftime("%H:%M:%S")    # HH:MM:SS
-  epoch_datetime = epoch_date + " " + epoch_time                # full timestamp utc
+
+  epoch_yday = tle[0][20..31].to_f
+  elapsed_jd = (Date.ordinal(epoch_year, epoch_yday).ajd - 2451545).to_f           # days since 2000-01-01
+
 
   if tle[0][53] == "-"
     b_star = ("-0." + (tle[0][54..58].to_i * 10**tle[0][60].to_i).to_s).to_f
@@ -232,8 +231,8 @@ tle_line_array.each do |tle|
 
 
   sat[:norad_id] = tle[0][2..6]
-  sat[:launch_date] = Date.ordinal(launch_year, launch_day).to_s # string or date?
-  sat[:epoch_date] = epoch_datetime
+  sat[:launch_date] = Date.ordinal(launch_year, launch_day).to_s
+  sat[:epoch_date] = elapsed_jd
   sat[:b_star] = b_star
   sat[:inclination] = tle[1][8..15].to_f
   sat[:right_asc] = tle[1][17..24].to_f
