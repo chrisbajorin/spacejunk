@@ -1,18 +1,3 @@
-// // function globeInit() {
-
-// //   d3.json("http://host/data/load", function(error, countries) {
-// //   console.log(countries)
-// //   });
-
-// // }
-
-
-
-
-
-// //// potential physics
-
-
 
 // GREENWICH MEAN SIDERIAL TIME
 
@@ -21,30 +6,27 @@
 // t02 =
 // gmst = 100.46061837 + (36000.770053608 * t0) + (0.000387933 * (t0 * t0)) - ((t0*t0*t0) / 38710000)
 
-// gmst
-
 // constants
 
 // formula source: http://celestrak.com/NORAD/documentation/spacetrk.pdf
 // just some astrophysics. No big deal.
 
-t0 = sat.epoch_date // need to make epoch the gmst from 1950, not 2000 (add 50*365.25)
+t0 = sat.epoch_date                             // need to make epoch the gmst from 1950, not 2000 (add 50*365.25)
 n0 = sat.mean_motion
 e0 = sat.eccentricity
 M0 = sat.mean_anomoly
 w0 = sat.perigee
 om0 = sat.right_ascention
 i0 = sat.inclination
-j2 = (5.41308*Math.pow(10, -4)) // formula replacement, not actual j2
-j2c = (1.0826269*Math.pow(10,-3)) // constant value of j2
-j3c = (-2.53881*Math.pow(10, -6)) // actual j3 not the constant
-j4 = (0.62098875*Math.pow(10, -6)) // formula replacement, not j4, but also within standard dev. of j4c
+nd0 = sat.first_derivative
+ndd0 = sat.second_derivative
+j2 = (5.41308*Math.pow(10, -4))                 // formula replacement, not actual j2
+j2c = (1.0826269*Math.pow(10,-3))               // constant value of j2
+j3c = (-2.53881*Math.pow(10, -6))               // actual j3 not the constant
+j4 = (0.62098875*Math.pow(10, -6))              // formula replacement, not j4, but also within standard dev. of j4c
 
 E6 = Math.pow(10, -6)
 t = // julian now
-
-nd0 // derivative to time of n0
-ndd0 // second derivative to time of n0
 
 ke = Math.sqrt(398600.4418)
 a1 = Math.pow((ke/n0), 2/3)
@@ -56,7 +38,6 @@ L0 = M0 + w0 + om0
 dOm = (-3 * j2 * n0 * Math.cos(i0) / Math.pow(p0, 2))
 dw = (3/2 * j2 * n0 * ((5 * Math.pow(Math.cos(i0), 2)) - 1) / Math.pow(p0, 2))
 aA = a0 * Math.pow((n0 / (n0 + (nd0 *(t - t0)) + (ndd0 / 2 * Math.pow((t- t0), 2)))), 2/3)
-// eE
 if (aA > q0) {
     eE = (1 - (q0/aA))
 } else {
@@ -82,9 +63,9 @@ sinuU = (aA/rR) * ( Math.sin(eW) - aYnsl - ( aXnsl * esinE / (1 + Math.sqrt(1 - 
 cosuU = (aA/rR) * ( Math.cos(eW) - aXnsl + ( aYnsl * esinE / (1 + Math.sqrt(1 - eL2)) ) )
 uU = Math.atan(sinuU / cosuU)
 rRk = rR + ((j2 * Math.pow(Math.sin(i0), 2) * Math.cos(2 * uU)) / (2 * pL ))
-uUk = uU - ((j2 * (7 * Math.pow(Math.sin(i0), 2) - 1) * Math.sin(2 * uU)) / (4 * Math.pow(pL, 2))
-omk = omS0 + ( (3 * j2 * Math.cos(i0) * Math.sin(2 * uU)) / ( 2 * Math.pow(pL, 2)) )
-ik = i0 + ( (3 * j2 * Math.cos(i0) * Math.sin(i0) * Math.cos(2 * uU)) / ( 2 * Math.pow(pL, 2)) )
+uUk = uU - ((j2 * (7 * Math.pow(Math.sin(i0), 2) - 1) * Math.sin(2 * uU)) / (4 * Math.pow(pL, 2)))
+omk = omS0 + ((3 * j2 * Math.cos(i0) * Math.sin(2 * uU)) / ( 2 * Math.pow(pL, 2) ))
+ik = i0 + ((3 * j2 * Math.cos(i0) * Math.sin(i0) * Math.cos(2 * uU)) / ( 2 * Math.pow(pL, 2) ))
 
 // positions and vectors
 Mx = -(Math.sin(omk)*Math.cos(ik))

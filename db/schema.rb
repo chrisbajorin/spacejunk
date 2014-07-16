@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140714232148) do
+ActiveRecord::Schema.define(version: 20140716013654) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -28,6 +28,8 @@ ActiveRecord::Schema.define(version: 20140714232148) do
     t.float   "mean_anomoly"
     t.float   "mean_motion"
     t.integer "orbit_number"
+    t.float   "first_derivative"
+    t.float   "second_derivative"
   end
 
 end

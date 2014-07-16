@@ -224,10 +224,20 @@ tle_line_array.each do |tle|
 
 
   if tle[0][53] == "-"
-    b_star = ("-0." + (tle[0][54..58].to_i * 10**tle[0][60].to_i).to_s).to_f
+    b_star = ("-0." + tle[0][54..58]).to_f * 10**tle[0][59..60].to_f
   else
-    b_star = ("0." + (tle[0][54..58].to_i * 10**tle[0][60].to_i).to_s).to_f
+    b_star = ("0." + tle[0][54..58]).to_f * 10**tle[0][59..60].to_f
   end
+
+if tle[0][33] == "-"
+  der_1 = ("-0" + tle[0][34..42].to_s).to_f
+else
+  der_1 = ("0" + tle[0][34..42].to_s).to_f
+end
+
+  der_2 = ("0." + tle[0][45..49]).to_f * 10**tle[0][50..51].to_f
+
+
 
 
   sat[:norad_id] = tle[0][2..6]
@@ -241,6 +251,8 @@ tle_line_array.each do |tle|
   sat[:mean_anomoly] = tle[1][43..50].to_f
   sat[:mean_motion] = tle[1][52..62].to_f
   sat[:orbit_number] = tle[1][63..67].to_i
+  sat[:first_derivative] = der_1
+  sat[:second_derivative] = der_2
 
   Satellite.create(sat)
 end
