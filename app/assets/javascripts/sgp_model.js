@@ -9,7 +9,13 @@
 
 // helpers
 
+degToRad = function(deg) {
+    return deg*Math.PI/180;
+}
 
+radToDeg = function(rad) {
+    return rad*180/Math.PI;
+}
 
 
 
@@ -22,7 +28,7 @@
 // just some astrophysics. No big deal.
 
     // epoch_date used in these calculations is since 1950. epoch used in generating gmst is base julian time. (I believe)
-getPositionVectors = function(sat) {
+sgpPositionVectors = function(sat) {
 
     var t0, n0, e0, M0, w0, om0, i0, nd0, ndd0, j2, j2c, j3c, j4,
         E6, t, ke, a1, d1, a0, p0, q0, L0, dOm, dw, aA, eE, pP,
@@ -31,12 +37,12 @@ getPositionVectors = function(sat) {
         ik, Mx, My, Mz, Nx, Ny, Nz, Ux, Uy, Uz, Vx, Vy, Vz;
 
 
-    t0 = sat.epoch_date;                             // need to make epoch the gmst from 1950, not 2000 (add 50*365.25)
+    t0 = sat.epoch_date + (50*365.25);                             // need to make epoch the gmst from 1950, not 2000 (add 50*365.25)
     n0 = sat.mean_motion;
     e0 = sat.eccentricity;
-    M0 = sat.mean_anomoly;
-    w0 = sat.perigee;
-    om0 = sat.right_asc;
+    M0 = degToRad(sat.mean_anomoly);
+    w0 = degToRad(sat.perigee);
+    om0 = degToRad(sat.right_asc);
     i0 = degToRad(sat.inclination);
     nd0 = sat.first_derivative;
     ndd0 = sat.second_derivative;
@@ -45,7 +51,7 @@ getPositionVectors = function(sat) {
     j3c = (-2.53881*Math.pow(10, -6));               // actual j3 not the constant
     j4 = (0.62098875*Math.pow(10, -6));              // formula replacement, not j4, but also within standard dev. of j4c
     E6 = Math.pow(10, -6);
-    t = t0 + 10// julian now
+    t = t0 + 360;                                      // julian now
 
 
 
@@ -68,57 +74,45 @@ getPositionVectors = function(sat) {
         eE = Math.pow(10, -6);
     };
     pP = aA * (1 - Math.pow(eE, 2));
-
     // console.log(pP)  // working
 
     omS0 = om0 + (dOm * (t - t0));
     wS0 = w0 + (dw * (t = t0));
     LS = L0  + ((n0 + dw + dOm) * (t - t0)) + (nd0 / 2 * Math.pow((t-t0), 2)) + (ndd0 / 6 * Math.pow((t-t0), 3));
-
     // console.log("L0: " + L0 + "dw: " + dw + "dOm: " + dOm)  // L0 is NaN
 
     aYnsl = ((eE * Math.sin(w0)) - ((j3c*Math.sin(i0))/(2 * j2c * pP)));
     aXnsl = eE * Math.cos(wS0);
-
-
     // console.log(LS + " " + j3c + " " + i0)   // LS is NaN
     // console.log(aXnsl + " " + aYnsl)     //WORKS
 
     lL = ( LS-((j3c*Math.sin(i0)*aXnsl / (4*j2c*pP) * (( 3+5*Math.cos(i0)) / (1+Math.cos(i0))) )) );
-
     // console.log(lL)          // NaN
 
     UU = lL - omS0;
     eW = UU;
-
     // console.log(eW)              // NaN
 
     ecosE = (aXnsl*Math.cos(eW)) + (aYnsl*Math.sin(eW));
-
     // console.log(ecosE)          // NaN
 
     esinE = (aXnsl*Math.sin(eW)) - (aYnsl*Math.cos(eW));
     eL2 = Math.pow(aXnsl, 2) + Math.pow(aYnsl, 2);
     pL = aA * (1 - eL2);        // WORKS
     rR = aA * (1 - ecosE);      // this is the NaN
-
     // console.log(pL + " " + rR)
 
     rdR = ke * Math.sqrt(aA) * esinE / rR;
     rvdV = ke * Math.sqrt(pL) /rR;
-
     // console.log(rvdV)        // NaN
 
     sinuU = (aA/rR) * ( Math.sin(eW) - aYnsl - ( aXnsl * esinE / (1 + Math.sqrt(1 - eL2)) ) );
-
     // console.log(sinuU)       // NaN
 
     cosuU = (aA/rR) * ( Math.cos(eW) - aXnsl + ( aYnsl * esinE / (1 + Math.sqrt(1 - eL2)) ) );
-
     // console.log(cosuU)       // NaN
 
     uU = Math.atan(sinuU / cosuU);
-
     // console.log(uU);         // NaN
 
     rRk = rR + ((j2 * Math.pow(Math.sin(i0), 2) * Math.cos(2 * uU)) / (2 * pL ));
@@ -127,6 +121,7 @@ getPositionVectors = function(sat) {
     ik = i0 + ((3 * j2 * Math.cos(i0) * Math.sin(i0) * Math.cos(2 * uU)) / ( 2 * Math.pow(pL, 2) ));
 
     // console.log(rRk + " " + uUk + " " + omk + " " + ik)  // NaN
+
     // positions and vectors
     Mx = -(Math.sin(omk)*Math.cos(ik));
     My = Math.cos(omk)*Math.cos(ik);

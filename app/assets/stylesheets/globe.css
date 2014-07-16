@@ -1,3 +1,14 @@
+body {
+  background-color: #121212;
+}
+.star {
+  fill: white;
+}
+
+.satellite {
+  fill: gray;
+}
+
 .stroke {
   fill: none;
   stroke: #000;
@@ -28,8 +39,4 @@
 
 #ocean {
   fill: #1C6BA0;
-}
-
-.space {
-  fill: purple;
 }

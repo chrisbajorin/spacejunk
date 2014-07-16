@@ -4,51 +4,98 @@ var satellites = <%= @satellites.to_json.html_safe %>
 
   $(function(){
 
-    var width = 960,
-        height = 800;
-
-    // MAIN GLOBE
-    // var projection = d3.geo.orthographic()
-    //     .scale((height-100)/2)
-    //     .translate([width / 2, height / 2])
-    //     .clipAngle(90);
-
-    // var path = d3.geo.path()
-    //     .projection(projection);
-
-    // SATELLITE GLOBE
-    var satProjection = d3.geo.orthographic()
-        .scale((height-10)/2)
-        .translate(([width/2,height/2]))
-        .clipAngle(118);
-
-    var satPath = d3.geo.path()
-        .projection(satProjection)
-        .pointRadius(3);
-
-    // x-revolution
-    var λ = d3.scale.linear()
-        .domain([0, width])
-        .range([-180, 180]);
-
-    // // y-revolution
-    // var φ = d3.scale.linear()
-    //     .domain([0, height])
-    //     .range([90, -90]);
-
+    var width = $(window).width(),
+        height = $(window).height(),
+        pi = Math.PI,
+        globeScale = (height)/3,
+        satScale = (height)/2.9,
+        scaleRatio = globeScale/satScale,
+        starScale = height,
+        centerH = height/2,
+        centerW = width/2,
+        satClip = 90 + radToDeg(Math.acos(scaleRatio));
+        console.log(satClip)
 
     var svg = d3.select("body").append("svg")
         .attr("width", width)
         .attr("height", height);
 
 
-    // svg.on("mousemove", function() {
-    //   var p = d3.mouse(this);
-    //   satProjection.rotate([λ(p[0]), 0]);
-    //   projection.rotate([λ(p[0]), 0]);
-    //   svg.selectAll(".globe").attr("d", path);
-    //   svg.selectAll(".point").attr("d", satPath);
-    // });
+    // MAIN GLOBE
+    var projection = d3.geo.orthographic()
+        .scale(globeScale)
+        .translate([centerW, centerH])
+        .clipAngle(90);
+
+    var path = d3.geo.path()
+        .projection(projection);
+
+    // EARTH BACKGROUND FOR POTENTIAL ATMOSPHERE
+    var backgroundCircle = svg.append("svg:circle")
+        .attr('cx', centerW)
+        .attr('cy', centerH)
+        .attr('r', globeScale)
+        .attr('class', 'atmosphere');
+
+    // SATELLITE GLOBE
+    var satProjection = d3.geo.orthographic()
+        .scale(satScale)
+        .translate(([width/2,height/2]))
+        .clipAngle(satClip);
+
+    var satPath = d3.geo.path()
+        .projection(satProjection)
+        .pointRadius(3);
+
+
+    // STAR BACKGROUND
+    var starProjection = d3.geo.azimuthalEquidistant()
+        .scale(height)
+        .translate([width/2,height/2])
+
+    var starPath = d3.geo.path()
+        .projection(starProjection)
+        .pointRadius(1.5)
+
+
+    // x-rotation
+    var λ = d3.scale.linear()
+        .domain([0, width])
+        .range([-180, 180]);
+
+    // y-rotation
+    var φ = d3.scale.linear()
+        .domain([0, height])
+        .range([90, -90]);
+
+    svg.on("mousemove", function() {
+      var p = d3.mouse(this);
+      satProjection.rotate([λ(p[0]), 0]);  // φ(p[1]) - for y-rotation
+      projection.rotate([λ(p[0]), 0]);
+      starProjection.rotate([-λ(p[0]), 0]);
+      svg.selectAll(".star").attr("d", starPath);
+      svg.selectAll(".globe").attr("d", path);
+      svg.selectAll(".satellite").attr("d", satPath);
+    });
+
+    var zoom = d3.behavior.zoom()
+        .size([width, height])
+        .on("zoom", zoomed);
+
+
+    var starList = createStars(400);
+
+        var stars = svg.append("g")
+            .selectAll("g")
+            .data(starList)
+            .enter()
+            .append("path")
+                .attr("class", "star")
+                .attr("d", function(d){
+                    // starPath.pointRadius(d.properties.radius);
+                    return starPath(d);
+                })
+                .attr("opacity", function(d){ return Math.random() });
 
   d3.json("world.json", function(error, world) {
 
@@ -66,16 +113,23 @@ var satellites = <%= @satellites.to_json.html_safe %>
 
     var data = [[0,0], [10,10], [15,-20], [50,-40], [-100, 25]];
 
-    svg.selectAll("path.point")
-      .data(data)
+    svg.selectAll("path.satellite")
+      .data(satellites)
       .enter()
       .append("path")
       .datum(function(d) {
-        return {"type": "Point", "coordinates": d, "radius": 3};
+        return {"type": "Point", "coordinates": randomLonLat(), "radius": 5.5};
       })
-      .attr("class", "point")
+      .attr("class", "satellite")
       .attr("d", satPath);
   });
+
+  ////////////////////////////// potential gradient //////////////////////
+  var gradient = svg.append("svg:defs")
+    .append("svg:radialGradient")
+    .attr("id", "atmosphere-gradient")
+    .attr()
+
 
 })
 </script>
