@@ -86,7 +86,7 @@ uUk = uU - ((j2 * (7 * Math.pow(Math.sin(i0), 2) - 1) * Math.sin(2 * uU)) / (4 *
 omk = omS0 + ( (3 * j2 * Math.cos(i0) * Math.sin(2 * uU)) / ( 2 * Math.pow(pL, 2)) )
 ik = i0 + ( (3 * j2 * Math.cos(i0) * Math.sin(i0) * Math.cos(2 * uU)) / ( 2 * Math.pow(pL, 2)) )
 
-// vectors
+// positions and vectors
 Mx = -(Math.sin(omk)*Math.cos(ik))
 My = Math.cos(omk)*Math.cos(ik)
 Mz = Math.sin(ik)
@@ -95,10 +95,18 @@ Nx = Math.cos(omk)
 Ny = Math.sin(omk)
 Nz = 0
 
-Ux =
-Uy
-Uz
+Ux = (Mx * Math.sin(uUk)) + (Nx * Math.cos(uUk))
+Uy = (My * Math.sin(uUk)) + (Ny * Math.cos(uUk))
+Uz = (Mz * Math.sin(uUk)) + (Nz * Math.cos(uUk))
 
-Vx
-Vy
-Vz
+Vx = (Mx * Math.cos(uUk)) - (Nx * Math.sin(uUk))
+Vy = (My * Math.cos(uUk)) - (Ny * Math.sin(uUk))
+Vz = (Mz * Math.cos(uUk)) - (Nz * Math.sin(uUk))
+
+posX = rRk * Ux
+posY = rRk * Uy
+posZ = rRk * Uz
+
+vecX = (rdR * Ux) + (rvdV * Vx)
+vecY = (rdR * Uy) + (rvdV * Vy)
+vecZ = (rdR * Uz) + (rvdV * Vz)
