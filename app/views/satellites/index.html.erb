@@ -8,13 +8,13 @@ var satellites = <%= @satellites.to_json.html_safe %>
         height = 800;
 
     // MAIN GLOBE
-    var projection = d3.geo.orthographic()
-        .scale((height-100)/2)
-        .translate([width / 2, height / 2])
-        .clipAngle(90);
+    // var projection = d3.geo.orthographic()
+    //     .scale((height-100)/2)
+    //     .translate([width / 2, height / 2])
+    //     .clipAngle(90);
 
-    var path = d3.geo.path()
-        .projection(projection);
+    // var path = d3.geo.path()
+    //     .projection(projection);
 
     // SATELLITE GLOBE
     var satProjection = d3.geo.orthographic()
@@ -42,13 +42,13 @@ var satellites = <%= @satellites.to_json.html_safe %>
         .attr("height", height);
 
 
-    svg.on("mousemove", function() {
-      var p = d3.mouse(this);
-      satProjection.rotate([λ(p[0]), 0]);
-      projection.rotate([λ(p[0]), 0]);
-      svg.selectAll(".globe").attr("d", path);
-      svg.selectAll(".point").attr("d", satPath);
-    });
+    // svg.on("mousemove", function() {
+    //   var p = d3.mouse(this);
+    //   satProjection.rotate([λ(p[0]), 0]);
+    //   projection.rotate([λ(p[0]), 0]);
+    //   svg.selectAll(".globe").attr("d", path);
+    //   svg.selectAll(".point").attr("d", satPath);
+    // });
 
   d3.json("world.json", function(error, world) {
 
