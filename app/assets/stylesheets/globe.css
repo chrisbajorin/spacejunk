@@ -1,12 +1,12 @@
 body {
-  background-color: #121212;
+  background-color: black;
 }
 .star {
   fill: white;
 }
 
 .satellite {
-  fill: gray;
+  fill: #dbe6db;
 }
 
 .stroke {
@@ -32,11 +32,16 @@ body {
   stroke-width: .5px;
 }
 
-
 #land {
-  fill: #397628;
+  fill: #4e864e;
 }
 
 #ocean {
-  fill: #1C6BA0;
+  fill: #00007F;
+}
+
+#arcs {
+  fill: none;
+  stroke: white;
+  stroke-width: 2px;
 }
