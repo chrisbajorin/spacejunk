@@ -28,6 +28,7 @@ gem 'pry-rails'
 gem 'rspec-rails'
 gem 'shoulda-matchers'
 gem 'factory_girl_rails'
+gem 'rails_12factor', group: :production
 # gem 'awesome_print'
 
 
