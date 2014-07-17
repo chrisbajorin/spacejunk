@@ -108,7 +108,7 @@ var stars = svg.append("g")
   satellites.forEach(function(d) {
     satObjects.push(getArcs(d.inclination, d.right_asc))
   });
-  console.log(satObjects)
+  // console.log(satObjects)
 
   ////////////// TOPO FEATURES /////////////////
 
@@ -130,28 +130,32 @@ queue()
         .attr("id", "land")
         .attr("d", path);
 
-    // var data = [[0,80]]
+    // var satData = [];
+
+    // satData = satObjects.forEach(function(d) {
+    //   // console.log(d)
+    //   var interp = d3.geo.interpolate(d.geometry.coordinates[0], d.geometry.coordinates[1]);
+    //   satData.push(interp(Math.random()));
+    //   // console.log(interp(Math.random()))
+    // });
+    // console.log(satData)
 
     // svg.selectAll("path.satellite")
-    //   .data(data)                   // replace with 'satellites'
+    //   .data(satObjects)                   // replace with 'satellites'
     //   .enter()
     //   .append("path")
     //   .datum(function(d) {
-    //     return {"type": "Point", "coordinates": d, "radius": 6};
+    //     console.log(d)
+    //     return {"type": "Point", "coordinates": randomOrbitPosition(d), "radius": 6};
     //   })
     //   .attr("class", "satellite")
     //   .attr("d", satPath);
-      // var satObjects = []
-      // satellites.forEach(function(d) {
-      //   satObjects.push(getArcs(d.inclination, d.right_asc))
-      // });
+
       // console.log(satObjects)
 
-      data = [getArcs(satellites[0].inclination, satellites[0].right_asc), getArcs(satellites[1].inclination, satellites[1].right_asc)]
-
-console.log(data)
-      arcs.selectAll("path.revolution")
-        .data(data[0])
+// console.log(data)
+      svg.selectAll("path.revolution")
+        .data(satObjects)
         .enter()
         .append("path")
         .attr("class", "revolution")
