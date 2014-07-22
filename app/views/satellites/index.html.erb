@@ -1,8 +1,13 @@
 <script>
 
-var satellites = <%= @satellites.to_json.html_safe %>
+// iterate through each satellite creating it's own projection with the #{norad_id}path, set the rotation
+// based on the revolutions per day and set the angle by the right ascension. No need for specific pathing
+// as long as you can calculate the starting position along it's own equator. completely eliminates the
+// need to make LineStrings with specific coordinates. You can then give a length of a line at a right
+// angle along it's own equator based on the speed of rotation, and give it a tail with a linear gradient.
 
-  // $(function(){
+
+var satellites = <%= @satellites.to_json.html_safe %>
 
 var width = $(window).width(),
     height = $(window).height(),
@@ -20,7 +25,7 @@ var svg = d3.select("body").append("svg")
     .attr("height", height);
 
 
-// MAIN GLOBE //
+////////// GLOBE PROJECTION //////////////
 var projection = d3.geo.orthographic()
     .scale(globeScale)
     .translate([centerW, centerH])
@@ -30,27 +35,22 @@ var path = d3.geo.path()
     .projection(projection);
 
 
-
-// EARTH BACKGROUND FOR POTENTIAL ATMOSPHERE //
-// var backgroundCircle = svg.append("svg:circle")
-//     .attr('cx', centerW)
-//     .attr('cy', centerH)
-//     .attr('r', globeScale)
-//     .attr('class', 'atmosphere');
-
-
-// SATELLITE GLOBE //
+/////// SATELLITE PROJECTION ////////////
 var satProjection = d3.geo.orthographic()
     .scale(satScale)
-    .translate(([width/2,height/2]))
+    .translate([centerW,centerH])
     .clipAngle(satClip);
 
 var satPath = d3.geo.path()
     .projection(satProjection)
     .pointRadius(3);
 
+  var satObjects = []
+  satellites.forEach(function(d) {
+    satObjects.push(getArcs(d.inclination, d.right_asc))
+  });
 
-// STAR BACKGROUND //
+//////////// STAR BACKGROUND //////////////
 var starProjection = d3.geo.azimuthalEquidistant()
     .scale(height)
     .translate([width/2,height/2])
@@ -60,7 +60,7 @@ var starPath = d3.geo.path()
     .pointRadius(Math.random() + 1)
 
 
-// ROTATION //
+///////////// ROTATION /////////////
 // x-rotation
 var λ = d3.scale.linear()
     .domain([0, width])
@@ -75,17 +75,17 @@ svg.on("mousemove", function() {
   var p = d3.mouse(this);
 
   starProjection.rotate([-λ(p[0]), 0]);
-  satProjection.rotate([λ(p[0]), 0]);  // φ(p[1]) - for y-rotation
+  // satProjection.rotate([λ(p[0]), 0]);  // φ(p[1]) - for y-rotation
   projection.rotate([λ(p[0]), 0]);
 
   svg.selectAll(".star").attr("d", starPath);
   svg.selectAll(".globe").attr("d", path);
-  svg.selectAll(".satellite").attr("d", satPath);
-  svg.selectAll(".revolution").attr("d", satPath);
+  // svg.selectAll(".satellite").attr("d", satPath);
+  // svg.selectAll(".revolution").attr("d", satPath);
 });
 
 
-// STAR CREATION //
+////////////// STAR CREATION ////////////////
 var starList = createStars(800);
 
 var stars = svg.append("g")
@@ -98,17 +98,6 @@ var stars = svg.append("g")
         .attr("d", function(d){ return starPath(d); })
         .attr("opacity", function(d){ return Math.random() });
 
-
-/////////////////// MAYBE /////////////////////
-
-  var arcs = svg.append("g")
-  .attr("id", "arcs");
-
-  var satObjects = []
-  satellites.forEach(function(d) {
-    satObjects.push(getArcs(d.inclination, d.right_asc))
-  });
-  // console.log(satObjects)
 
   ////////////// TOPO FEATURES /////////////////
 
@@ -130,73 +119,38 @@ queue()
         .attr("id", "land")
         .attr("d", path);
 
-    // var satData = [];
-
-    // satData = satObjects.forEach(function(d) {
-    //   // console.log(d)
-    //   var interp = d3.geo.interpolate(d.geometry.coordinates[0], d.geometry.coordinates[1]);
-    //   satData.push(interp(Math.random()));
-    //   // console.log(interp(Math.random()))
-    // });
-    // console.log(satData)
-
-    // svg.selectAll("path.satellite")
-    //   .data(satObjects)                   // replace with 'satellites'
-    //   .enter()
-    //   .append("path")
-    //   .datum(function(d) {
-    //     console.log(d)
-    //     return {"type": "Point", "coordinates": randomOrbitPosition(d), "radius": 6};
-    //   })
-    //   .attr("class", "satellite")
-    //   .attr("d", satPath);
-
-      // console.log(satObjects)
-
-// console.log(data)
       svg.selectAll("path.revolution")
         .data(satObjects)
         .enter()
         .append("path")
         .attr("class", "revolution")
-        // .attr("id", function(d) { d.norad_id })
-        .attr("d", satPath)
-
-
-////////////// MAYBE //////////////////
-
-// var arc = d3.geo.greatArc()
-//   .precision(1);
-
-//   var links = [{
-//     'source': [0, 0],
-//       'target': [114.15769,0]
-//   }];
-
-//   arcs.selectAll("path")
-//   .data(links)
-//   .enter().append("path")
-//   .style("stroke-width", 2)
-//   .style("stroke", "orange")
-//   .style("fill", "none")
-//   .attr("d", function(d) {
-//     console.log(d);
-//     var interp = d3.geo.interpolate(d.source, d.target)     // d3.geo.interpolate - returns function to calculate
-//     console.log(interp(.5))                                 // a intermediary point along the line.
-//     console.log(path(arc(d)));
-//     return path(arc(d)); });
-
-
-
-
-
+        .attr("id", function(d, i) { return d.norad_id; })
+        .attr("d", satPath);
 
 };
+
+
+
+
+
+
+
+
+
+
+
   ////////////////////////////// potential gradient //////////////////////
 
-var gradient = svg.append("svg:defs")
-  .append("svg:radialGradient")
-  .attr("id", "atmosphere-gradient")
-  .attr()
+// var gradient = svg.append("svg:defs")
+//   .append("svg:radialGradient")
+//   .attr("id", "atmosphere-gradient")
+//   .attr()
+
+// EARTH BACKGROUND FOR POTENTIAL ATMOSPHERE //
+// var backgroundCircle = svg.append("svg:circle")
+//     .attr('cx', centerW)
+//     .attr('cy', centerH)
+//     .attr('r', globeScale)
+//     .attr('class', 'atmosphere');
 
 </script>

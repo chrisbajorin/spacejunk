@@ -1,4 +1,8 @@
+function randomLonLat() {
+    return [Math.random() * 360 - 180, Math.random() * 180 - 90];
+}
 
+// strangely, it creates stars
 function createStars(number){
     var data = [];
     for(var i = 0; i < number; i++){
@@ -14,12 +18,6 @@ function createStars(number){
         });
     }
     return data;
-}
-
-// returns a random latitude/longitude point for testing purposes. Will be deprecated when
-// satellite data is inputted.
-function randomLonLat() {
-    return [Math.random() * 360 - 180, Math.random() * 180 - 90];
 }
 
 // equirectangular projection formula for latitude/longitude from inclination and starting point
@@ -45,9 +43,10 @@ function getArcs(inclination, startLongitude){
     return makeGeoObject(array);
 };
 
+
 // creates the orbital path line object for a given satellite
 function makeGeoObject(positionArray) {
-        object = {
+        var object = {
             "type":"Feature",
             "geometry":{
                 "type":"LineString",
@@ -57,6 +56,27 @@ function makeGeoObject(positionArray) {
         return object;
 }
 
+
+// random position along 'equator' of the satellite path
+function makeSatelliteObject() {
+    var object = {
+        "type":"Feature",
+        "geometry":{
+            "type": "Point",
+            "coordinates": [0, 360*Math.random()],
+            "radius": 6 }
+        };
+    return object;
+}
+
+
+// degree/radian conversionss
+function degToRad(deg) {
+    return deg*Math.PI/180;
+}
+function radToDeg(rad) {
+    return rad*180/Math.PI;
+}
 
 // creates a random point along the satellite orbit
 // temporarily to place satellites on their specific orbit
@@ -77,12 +97,3 @@ function makeGeoObject(positionArray) {
 //         console.log(interp)
 //         return interp(rand2);
 // }
-
-
-// degree/radian conversionss
-function degToRad(deg) {
-    return deg*Math.PI/180;
-}
-function radToDeg(rad) {
-    return rad*180/Math.PI;
-}

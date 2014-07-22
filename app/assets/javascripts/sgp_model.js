@@ -1,13 +1,9 @@
 
-// GREENWICH MEAN SIDERIAL TIME
+// just some astrophysics. No big deal.
 
-// t0 = sat.epoch_date/36525
-// t01 =
-// t02 =
-// gmst = 100.46061837 + (36000.770053608 * t0) + (0.000387933 * (t0 * t0)) - ((t0*t0*t0) / 38710000)
 
 // formula source: http://celestrak.com/NORAD/documentation/spacetrk.pdf
-// just some astrophysics. No big deal.
+
 // epoch_date used in these calculations is since 1950.
 // epoch used in generating gmst is base julian time. (I believe)
 
@@ -34,7 +30,7 @@ sgpPositionVectors = function(sat) {
     j3c = (-2.53881*Math.pow(10, -6));             // actual j3 harmonic, not a formula replacement
     j4 = (0.62098875*Math.pow(10, -6));            // formula replacement, not actual j4, but close enough to j4 for gov't work
     E6 = Math.pow(10, -6);
-    t = t0 + 360;                                  // fake julian now
+    t = t0 + 360;                                  // temporarily fake julian date change
 
 
 
@@ -54,6 +50,7 @@ sgpPositionVectors = function(sat) {
     } else {
         eE = Math.pow(10, -6);
     };
+
     pP = aA * (1 - Math.pow(eE, 2));
     omS0 = om0 + (dOm * (t - t0));
     wS0 = w0 + (dw * (t = t0));
@@ -108,3 +105,11 @@ sgpPositionVectors = function(sat) {
 
     return [sat, satellite];
 }
+
+
+// GREENWICH MEAN SIDERIAL TIME
+
+// t0 = sat.epoch_date/36525
+// t01 =
+// t02 =
+// gmst = 100.46061837 + (36000.770053608 * t0) + (0.000387933 * (t0 * t0)) - ((t0*t0*t0) / 38710000)
