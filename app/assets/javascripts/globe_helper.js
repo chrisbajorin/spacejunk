@@ -20,6 +20,7 @@ function createStars(number){
     return data;
 }
 
+
 // equirectangular projection formula for latitude/longitude from inclination and starting point
 // reversed the haversine formula.
 function getArcs(inclination, startLongitude){
@@ -64,7 +65,7 @@ function makeSatelliteObject() {
         "geometry":{
             "type": "Point",
             "coordinates": [0, 360*Math.random()],
-            "radius": 6 }
+            "radius": 40 }
         };
     return object;
 }
@@ -77,6 +78,7 @@ function degToRad(deg) {
 function radToDeg(rad) {
     return rad*180/Math.PI;
 }
+
 
 // creates a random point along the satellite orbit
 // temporarily to place satellites on their specific orbit

@@ -1,10 +1,19 @@
 <script>
-
+$(function(){
 // iterate through each satellite creating it's own projection with the #{norad_id}path, set the rotation
 // based on the revolutions per day and set the angle by the right ascension. No need for specific pathing
 // as long as you can calculate the starting position along it's own equator. completely eliminates the
 // need to make LineStrings with specific coordinates. You can then give a length of a line at a right
 // angle along it's own equator based on the speed of rotation, and give it a tail with a linear gradient.
+
+// eventual data format:
+// satellites = {
+//   "pointObject":makeSatelliteObject(),
+//   "satPath":satPath,
+//   "satProjection":satProjection,
+//   "rotationVelocity":rotationVelocity
+// }
+
 
 
 var satellites = <%= @satellites.to_json.html_safe %>
@@ -12,6 +21,7 @@ var satellites = <%= @satellites.to_json.html_safe %>
 var width = $(window).width(),
     height = $(window).height(),
     pi = Math.PI,
+    t0 = Date.now(),
     globeScale = (height)/4,
     satScale = (height)/2.9,
     scaleRatio = globeScale/satScale,
@@ -29,6 +39,7 @@ var svg = d3.select("body").append("svg")
 var projection = d3.geo.orthographic()
     .scale(globeScale)
     .translate([centerW, centerH])
+    .rotate([0,0,0])
     .clipAngle(90);
 
 var path = d3.geo.path()
@@ -36,19 +47,45 @@ var path = d3.geo.path()
 
 
 /////// SATELLITE PROJECTION ////////////
-var satProjection = d3.geo.orthographic()
+// var satProjection = d3.geo.orthographic()
+//     .scale(satScale)
+//     .translate([centerW,centerH])
+//     .clipAngle(satClip);
+
+// var satPath = d3.geo.path()
+//     .projection(satProjection)
+//     .pointRadius(3);
+
+  var satObjects = []
+  satellites.forEach(function(d) {
+    satObjects.push(makeSatelliteObject())
+    // satObjects.push(getArcs(d.inclination, d.right_asc))
+  });
+
+///////
+
+satProjections = []
+satPaths = [];
+satellites.forEach(function(d) {
+  var satProjection = d3.geo.orthographic()
     .scale(satScale)
     .translate([centerW,centerH])
+    .rotate([d.right_asc, 0, d.inclination])
     .clipAngle(satClip);
 
 var satPath = d3.geo.path()
     .projection(satProjection)
-    .pointRadius(3);
+    // .pointRadius(3);
 
-  var satObjects = []
-  satellites.forEach(function(d) {
-    satObjects.push(getArcs(d.inclination, d.right_asc))
-  });
+  satPaths.push(satPath)
+  satProjections.push(satProjection)
+})
+
+
+//////
+
+var rotationVelocity = [6, 0]
+
 
 //////////// STAR BACKGROUND //////////////
 var starProjection = d3.geo.azimuthalEquidistant()
@@ -71,18 +108,19 @@ var λ = d3.scale.linear()
 //     .domain([0, height])
 //     .range([90, -90]);
 
-svg.on("mousemove", function() {
-  var p = d3.mouse(this);
 
-  starProjection.rotate([-λ(p[0]), 0]);
-  // satProjection.rotate([λ(p[0]), 0]);  // φ(p[1]) - for y-rotation
-  projection.rotate([λ(p[0]), 0]);
+// svg.on("mousemove", function() {
+//   var p = d3.mouse(this);
 
-  svg.selectAll(".star").attr("d", starPath);
-  svg.selectAll(".globe").attr("d", path);
-  // svg.selectAll(".satellite").attr("d", satPath);
-  // svg.selectAll(".revolution").attr("d", satPath);
-});
+//   starProjection.rotate([-λ(p[0]), 0]);
+//   // satProjection.rotate([λ(p[0]), 0]);  // φ(p[1]) - for y-rotation
+//   projection.rotate([λ(p[0]), 0, 23]);
+
+//   svg.selectAll(".star").attr("d", starPath);
+//   svg.selectAll(".globe").attr("d", path);
+//   // svg.selectAll(".satellite").attr("d", satPath);
+//   // svg.selectAll(".revolution").attr("d", satPath);
+// });
 
 
 ////////////// STAR CREATION ////////////////
@@ -107,25 +145,44 @@ queue()
 
   function ready(error, world){
 
-    svg.append("path")
+    var ocean = svg.append("path")
         .datum(topojson.feature(world, world.objects.ocean))
         .attr("class", "globe")
         .attr("id", "ocean")
         .attr("d", path);
 
-    svg.append("path")
+    var land = svg.append("path")
         .datum(topojson.feature(world, world.objects.land))
         .attr("class", "globe")
         .attr("id", "land")
         .attr("d", path);
 
-      svg.selectAll("path.revolution")
+    svg.selectAll("path.satellite")
         .data(satObjects)
         .enter()
         .append("path")
-        .attr("class", "revolution")
-        .attr("id", function(d, i) { return d.norad_id; })
-        .attr("d", satPath);
+        .attr("class", "satellite")
+        .attr("id", function(d, i) { return satellites[i].norad_id; })
+        .attr("d", function(d,i) { return satPaths[i](d); });
+
+    // var sats = svg.append("path")
+    //     .datum(satObjects[0])
+    //       .attr("class", "satellite")
+    //       .attr("id", function(d) { return satellites[0].norad_id })
+    //       .attr("d", function(d) { return satPaths[0](d) })
+
+        d3.timer(function() {
+          var t = (Date.now()-t0)/1000;
+          // projection.rotate([0 + rotationVelocity[0]*t, 0, 0]);
+          // ocean.attr("d", path);
+          // land.attr("d", path);
+          satProjections.forEach(function(d,i) {
+            d.rotate([satellites[i].right_asc + rotationVelocity[0]*t, 0,  270 + satellites[i].inclination])
+            d3.select($("#"+satellites[i].norad_id)[0]).attr("d", function(d) { return satPaths[i](d) })
+          })
+          // satProjections[0].rotate([0, satellites[0].right_asc + rotationVelocity[0]*t , 270 + 23 + satellites[0].inclination])
+          // sats.attr("d", function(d) { return satPaths[0](d) })
+        })
 
 };
 
@@ -152,5 +209,5 @@ queue()
 //     .attr('cy', centerH)
 //     .attr('r', globeScale)
 //     .attr('class', 'atmosphere');
-
+});
 </script>
