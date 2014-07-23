@@ -1,29 +1,33 @@
 <script>
-$(function(){
+// $(function(){
 // iterate through each satellite creating it's own projection with the #{norad_id}path, set the rotation
 // based on the revolutions per day and set the angle by the right ascension. No need for specific pathing
-// as long as you can calculate the starting position along it's own equator. completely eliminates the
+// as long as you can calculate the starting position along it's own equator. Completely eliminates the
 // need to make LineStrings with specific coordinates. You can then give a length of a line at a right
 // angle along it's own equator based on the speed of rotation, and give it a tail with a linear gradient.
 
 // eventual data format:
 // satellites = {
-//   "pointObject":makeSatelliteObject(),
-//   "satPath":satPath,
-//   "satProjection":satProjection,
-//   "rotationVelocity":rotationVelocity
+//   "topoObject":makeSatelliteObject(),          //  topoJSON formatted satellite point. Need to add longitude start
+//   "satPath":satPath,                           //  Can add to satellite object to avoid making multiple arrays
+//   "satProjection":satProjection,               //  Same as satPath
+//   "projectionOffset": [λ,φ],                   //  Used for satellite rotation timer
+//   "rotationVelocity":rotationVelocity          //  Longitudinal rotation speed, based on rotations per day
 // }
 
 
 
 var satellites = <%= @satellites.to_json.html_safe %>
 
+// satellites = [satellites[0], satellites[1], satellites[2], satellites[3]]
+
+
 var width = $(window).width(),
     height = $(window).height(),
     pi = Math.PI,
     t0 = Date.now(),
-    globeScale = (height)/4,
-    satScale = (height)/2.9,
+    globeScale = (height)/4,  //
+    satScale = (height)/2.9,  // needs to be edited for accurate distance.
     scaleRatio = globeScale/satScale,
     starScale = height,
     centerH = height/2,
@@ -58,8 +62,12 @@ var path = d3.geo.path()
 
   var satObjects = []
   satellites.forEach(function(d) {
+    d.topoObject = makeSatelliteObject()
     satObjects.push(makeSatelliteObject())
     // satObjects.push(getArcs(d.inclination, d.right_asc))
+
+    /////
+    d.velocity = Math.random()*45
   });
 
 ///////
@@ -70,15 +78,16 @@ satellites.forEach(function(d) {
   var satProjection = d3.geo.orthographic()
     .scale(satScale)
     .translate([centerW,centerH])
-    .rotate([d.right_asc, 0, d.inclination])
+    .rotate([d.right_asc, 0, d.inclination]) // needs to be rotated along the haversine line
     .clipAngle(satClip);
 
 var satPath = d3.geo.path()
-    .projection(satProjection)
-    // .pointRadius(3);
+    .projection(satProjection);
 
-  satPaths.push(satPath)
-  satProjections.push(satProjection)
+    d.satPath = satPath;
+    d.satProjection = satProjection;
+  satPaths.push(satPath);
+  satProjections.push(satProjection);
 })
 
 
@@ -163,7 +172,9 @@ queue()
         .append("path")
         .attr("class", "satellite")
         .attr("id", function(d, i) { return satellites[i].norad_id; })
-        .attr("d", function(d,i) { return satPaths[i](d); });
+        .attr("d", function(d,i) {
+          console.log(satellites[i].satPath)
+          console.log(satPaths[i](d)); });
 
     // var sats = svg.append("path")
     //     .datum(satObjects[0])
@@ -171,22 +182,28 @@ queue()
     //       .attr("id", function(d) { return satellites[0].norad_id })
     //       .attr("d", function(d) { return satPaths[0](d) })
 
+
+                                         // sat projection needs to rotate along haversine formula along
+                                         // a reverse inclination where the distance is equal to the
+                                         // earth longitude to match right ascension along the earth's equator.
+
+
         d3.timer(function() {
           var t = (Date.now()-t0)/1000;
           // projection.rotate([0 + rotationVelocity[0]*t, 0, 0]);
           // ocean.attr("d", path);
           // land.attr("d", path);
           satProjections.forEach(function(d,i) {
-            d.rotate([satellites[i].right_asc + rotationVelocity[0]*t, 0,  270 + satellites[i].inclination])
-            d3.select($("#"+satellites[i].norad_id)[0]).attr("d", function(d) { return satPaths[i](d) })
+            d.rotate([satellites[i].right_asc + rotationVelocity[0]*t, 0, satellites[i].inclination])
+            d3.select($("#"+satellites[i].norad_id)[0]).attr("d", function(d) {
+              return satPaths[i](d) })
           })
+
           // satProjections[0].rotate([0, satellites[0].right_asc + rotationVelocity[0]*t , 270 + 23 + satellites[0].inclination])
           // sats.attr("d", function(d) { return satPaths[0](d) })
         })
 
 };
-
-
 
 
 
@@ -209,5 +226,5 @@ queue()
 //     .attr('cy', centerH)
 //     .attr('r', globeScale)
 //     .attr('class', 'atmosphere');
-});
+// });
 </script>

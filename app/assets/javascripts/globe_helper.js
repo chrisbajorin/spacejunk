@@ -20,7 +20,6 @@ function createStars(number){
     return data;
 }
 
-
 // equirectangular projection formula for latitude/longitude from inclination and starting point
 // reversed the haversine formula.
 function getArcs(inclination, startLongitude){
@@ -64,12 +63,15 @@ function makeSatelliteObject() {
         "type":"Feature",
         "geometry":{
             "type": "Point",
-            "coordinates": [0, 360*Math.random()],
+            "coordinates": [360*Math.random(), 0],
             "radius": 40 }
         };
     return object;
 }
 
+function getSiderealAscension(satellite) {
+    return (satellite.right_asc + getMST()) % 360;
+}
 
 // degree/radian conversionss
 function degToRad(deg) {
@@ -78,24 +80,3 @@ function degToRad(deg) {
 function radToDeg(rad) {
     return rad*180/Math.PI;
 }
-
-
-// creates a random point along the satellite orbit
-// temporarily to place satellites on their specific orbit
-
-// function randomOrbitPosition(satellite) {
-//     var pos1 = satellite.geometry.coordinates[0],
-//         pos2 = satellite.geometry.coordinates[1],
-//         pos3 = satellite.geometry.coordinates[2]
-//         rand1 = Math.random(),  // for interpolate
-//         rand2 = Math.random(),  // for if/then lat
-//         interp;
-
-//         if (rand1 < 0.5) {
-//             interp = d3.geo.interpolate(pos2, pos3)
-//         } else {
-//             interp = d3.geo.interpolate(pos1, pos2)
-//         };
-//         console.log(interp)
-//         return interp(rand2);
-// }
