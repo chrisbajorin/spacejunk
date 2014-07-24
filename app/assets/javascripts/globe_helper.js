@@ -22,25 +22,8 @@ function createStars(number){
 
 // equirectangular projection formula for latitude/longitude from inclination and starting point
 // reversed the haversine formula.  Deprecated.
-function getArcs(inclination, startLongitude){
-    var i1 = 90 - inclination,
-        i2 = 270 + inclination,
-        la1 = 0,
-        lo1 = startLongitude,
-        d = 180/360 * 40075,
-        R = 6371;
 
-    i1 = degToRad(i1);
-    i2 = degToRad(i2);
-    φ1 = degToRad(la1);
-    λ1 = degToRad(lo1);
-    var φ2 = Math.asin( Math.sin(φ1)*Math.cos(d/R) + Math.cos(φ1)*Math.sin(d/R)*Math.cos(i1) );
-    var λ2 = λ1 + Math.atan2(Math.sin(i1)*Math.sin(d/R)*Math.cos(φ1), Math.cos(d/R)-Math.sin(φ1)*Math.sin(φ2));
-    var λ2d = λ1 + Math.atan2(Math.sin(i2)*Math.sin(d/R)*Math.cos(φ1), Math.cos(d/R)-Math.sin(φ1)*Math.sin(φ2));
 
-    array = [[radToDeg(λ2), radToDeg(φ2)], [startLongitude, 0], [radToDeg(λ2d), -radToDeg(φ2)]]
-    return makeGeoObject(array);
-};
 
 
 // satellite projection offset to adjust for RAAN
@@ -49,6 +32,10 @@ function getOffset(satellite){
         d = satellite.adjustedRAAN/360 * 40030,
         R = 6371;
         console.log(d)
+
+        // these are the full formulas. Since my starting point is [0,0], I elminated terms that evaluate to 0 or 1.
+    // var φ2 = Math.asin( Math.sin(φ1)*Math.cos(d/R) + Math.cos(φ1)*Math.sin(d/R)*Math.cos(i1) );
+    // var λ2 = λ1 + Math.atan2(Math.sin(i1)*Math.sin(d/R)*Math.cos(φ1), Math.cos(d/R)-Math.sin(φ1)*Math.sin(φ2));
 
     var φ2 = Math.asin(Math.sin(d/R)*Math.cos(i1));
     var λ2 = Math.atan2(Math.sin(i1)*Math.sin(d/R), Math.cos(d/R));
@@ -75,9 +62,9 @@ function makeSatelliteObject() {
         "type":"Feature",
         "geometry":{
             "type": "Point",
-            "coordinates": [360 * Math.random(), 0],
-            "radius": 40 }
-        };
+            "coordinates": [360 * Math.random(), 0]
+        }
+    };
     return object;
 }
 

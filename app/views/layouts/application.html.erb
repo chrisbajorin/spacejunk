@@ -10,6 +10,23 @@
 <script src="http://d3js.org/topojson.v1.min.js"></script>
 </head>
 <body>
+    <svg id="defs", width="0", height>
+        <defs>
+            <filter id="glow">
+                <feColorMatrix type="matrix"
+                    values=
+                    "0 0 0 0   0
+                     0 0 0 .2   0
+                     0 0 0 .5   0
+                     0 0 0 1   0"/>
+                <feGaussianBlur stdDeviation="35" result="coloredBlur"/>
+                <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+        </defs>
+    </svg>
 
 <%= yield %>
 

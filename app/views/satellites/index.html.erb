@@ -34,8 +34,8 @@ var width = $(window).width(),
     height = $(window).height(),
     pi = Math.PI,
     t0 = Date.now(),
-    globeScale = (height)/4,  //
-    satScale = (height)/2.9,  // needs to be edited for accurate distance.
+    globeScale = (height)/2.8,  //
+    satScale = (height)/2.4,  // needs to be edited for accurate distance.
     scaleRatio = globeScale/satScale,
     starScale = height,
     centerH = height/2,
@@ -72,10 +72,6 @@ var path = d3.geo.path()
   satellites.forEach(function(d) {
     d.topoObject = makeSatelliteObject()
     satObjects.push(makeSatelliteObject())
-    // satObjects.push(getArcs(d.inclination, d.right_asc))
-
-    /////
-    d.velocity = Math.random()*45
   });
 
 ///////
@@ -90,7 +86,8 @@ satellites.forEach(function(d) {
     .clipAngle(satClip);
 
 var satPath = d3.geo.path()
-    .projection(satProjection);
+    .projection(satProjection)
+    .pointRadius(5);
 
     d.satPath = satPath;
     d.satProjection = satProjection;
@@ -213,16 +210,13 @@ queue()
 
   ////////////////////////////// potential gradient //////////////////////
 
-// var gradient = svg.append("svg:defs")
-//   .append("svg:radialGradient")
-//   .attr("id", "atmosphere-gradient")
-//   .attr()
-
 // EARTH BACKGROUND FOR POTENTIAL ATMOSPHERE //
-// var backgroundCircle = svg.append("svg:circle")
-//     .attr('cx', centerW)
-//     .attr('cy', centerH)
-//     .attr('r', globeScale)
-//     .attr('class', 'atmosphere');
+var backgroundCircle = svg.append("svg:circle")
+    .attr('cx', centerW)
+    .attr('cy', centerH)
+    .attr('r', globeScale)
+    .attr('class', 'atmosphere')
+    .attr("filter", "url(#glow)")
+    .attr("fill", "url(#atmosphere-gradient)");
 // });
 </script>

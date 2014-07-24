@@ -1,6 +1,7 @@
 body {
   background-color: black;
 }
+
 .star {
   fill: white;
 }
@@ -33,11 +34,11 @@ body {
 }
 
 #land {
-  fill: #4e864e;
+  fill: #306000;
 }
 
 #ocean {
-  fill: #00007F;
+  fill: #03104F;
 }
 
 .revolution {
@@ -46,3 +47,8 @@ body {
   stroke-width: 2px;
   opacity: .1;
 }
+
+/*.atmosphere {
+    stroke: rgba(255, 255, 255, .5);
+    stroke-width: .25px;
+}*/
