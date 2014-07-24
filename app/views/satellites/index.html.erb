@@ -184,9 +184,9 @@ queue()
 
     d3.timer(function() {
       var t = (Date.now()-t0)/1000;
-      // projection.rotate([0 + rotationVelocity[0]*t, 0, 0]);
-      // ocean.attr("d", path);
-      // land.attr("d", path);
+      projection.rotate([0 + rotationVelocity[0]*t, 0, 0]);
+      ocean.attr("d", path);
+      land.attr("d", path);
 
       satProjections.forEach(function(d,i) {
         d.rotate([satellites[i].projectionOffset[1] + rotationVelocity[0]*t, satellites[i].projectionOffset[0], satellites[i].inclination])
