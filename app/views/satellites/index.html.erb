@@ -184,7 +184,7 @@ queue()
 
     d3.timer(function() {
       var t = (Date.now()-t0)/1000;
-      projection.rotate([0 + rotationVelocity[0]*t, 0, 0]);
+      projection.rotate([0 + 6*t, 0, 0]);
       ocean.attr("d", path);
       land.attr("d", path);
 
