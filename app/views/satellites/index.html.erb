@@ -21,6 +21,13 @@
 var satellites = <%= @satellites.to_json.html_safe %>
 
 // satellites = [satellites[0], satellites[1], satellites[2], satellites[3]]
+// satellites = [satellites[7]]
+
+satellites.forEach(function(d) {
+  d.adjustedRAAN = getSiderealAscension(d);
+  d.projectionOffset = getOffset(d)
+  console.log(d.projectionOffset)
+})
 
 
 var width = $(window).width(),
@@ -79,7 +86,7 @@ satellites.forEach(function(d) {
   var satProjection = d3.geo.orthographic()
     .scale(satScale)
     .translate([centerW,centerH])
-    .rotate([d.right_asc, 0, d.inclination]) // needs to be rotated along the haversine line
+    // .rotate([d.projectionOffset[0], d.projectionOffset[1], d.inclination]) // needs to be rotated along the haversine line
     .clipAngle(satClip);
 
 var satPath = d3.geo.path()
@@ -173,6 +180,7 @@ queue()
         .append("path")
         .attr("class", "satellite")
         .attr("id", function(d, i) { return satellites[i].norad_id; })
+        // .attr("xlink:href", "http://www.satview.org/imagens/satelite_icone_2.gif")
 
     d3.timer(function() {
       var t = (Date.now()-t0)/1000;
@@ -181,7 +189,7 @@ queue()
       // land.attr("d", path);
 
       satProjections.forEach(function(d,i) {
-        d.rotate([satellites[i].right_asc + rotationVelocity[0]*t, 0, satellites[i].inclination])
+        d.rotate([satellites[i].projectionOffset[1] + rotationVelocity[0]*t, satellites[i].projectionOffset[0], satellites[i].inclination])
         d3.select($("#"+satellites[i].norad_id)[0]).attr("d", function(d) {
           return satPaths[i](d)
         });
