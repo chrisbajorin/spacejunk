@@ -11,6 +11,7 @@
 //   "topoObject":makeSatelliteObject(),          //  topoJSON formatted satellite point. Need to add longitude start
 //   "satPath":satPath,                           //  Can add to satellite object to avoid making multiple arrays
 //   "satProjection":satProjection,               //  Same as satPath
+//   "adjustedRAAN": aR,
 //   "projectionOffset": [λ,φ],                   //  Used for satellite rotation timer
 //   "rotationVelocity":rotationVelocity          //  Longitudinal rotation speed, based on rotations per day
 // }
@@ -93,7 +94,7 @@ var satPath = d3.geo.path()
 
 //////
 
-var rotationVelocity = [6, 0]
+var rotationVelocity = [30, 0]
 
 
 //////////// STAR BACKGROUND //////////////
@@ -143,7 +144,7 @@ var stars = svg.append("g")
     .append("path")
         .attr("class", "star")
         .attr("d", function(d){ return starPath(d); })
-        .attr("opacity", function(d){ return Math.random() });
+        .attr("opacity", function(d){ return randOpacity(.35, 1) });
 
 
   ////////////// TOPO FEATURES /////////////////
@@ -166,43 +167,32 @@ queue()
         .attr("id", "land")
         .attr("d", path);
 
-    svg.selectAll("path.satellite")
+    var satElements = svg.selectAll("path.satellite")
         .data(satObjects)
         .enter()
         .append("path")
         .attr("class", "satellite")
         .attr("id", function(d, i) { return satellites[i].norad_id; })
-        .attr("d", function(d,i) {
-          console.log(satellites[i].satPath)
-          console.log(satPaths[i](d)); });
 
-    // var sats = svg.append("path")
-    //     .datum(satObjects[0])
-    //       .attr("class", "satellite")
-    //       .attr("id", function(d) { return satellites[0].norad_id })
-    //       .attr("d", function(d) { return satPaths[0](d) })
+    d3.timer(function() {
+      var t = (Date.now()-t0)/1000;
+      // projection.rotate([0 + rotationVelocity[0]*t, 0, 0]);
+      // ocean.attr("d", path);
+      // land.attr("d", path);
 
-
-                                         // sat projection needs to rotate along haversine formula along
-                                         // a reverse inclination where the distance is equal to the
-                                         // earth longitude to match right ascension along the earth's equator.
-
-
-        d3.timer(function() {
-          var t = (Date.now()-t0)/1000;
-          // projection.rotate([0 + rotationVelocity[0]*t, 0, 0]);
-          // ocean.attr("d", path);
-          // land.attr("d", path);
-          satProjections.forEach(function(d,i) {
-            d.rotate([satellites[i].right_asc + rotationVelocity[0]*t, 0, satellites[i].inclination])
-            d3.select($("#"+satellites[i].norad_id)[0]).attr("d", function(d) {
-              return satPaths[i](d) })
-          })
-
-          // satProjections[0].rotate([0, satellites[0].right_asc + rotationVelocity[0]*t , 270 + 23 + satellites[0].inclination])
-          // sats.attr("d", function(d) { return satPaths[0](d) })
-        })
-
+      satProjections.forEach(function(d,i) {
+        d.rotate([satellites[i].right_asc + rotationVelocity[0]*t, 0, satellites[i].inclination])
+        d3.select($("#"+satellites[i].norad_id)[0]).attr("d", function(d) {
+          return satPaths[i](d)
+        });
+      });
+      // satellites.forEach(function(d) {
+      //   // console.log(d)
+      //   (d.satProjection).rotate([d.right_asc + rotationVelocity[0]*t, 0, d.inclination]);
+      //   d.topoObject
+      //   d.satPath(d.topoObject);
+      // });
+    });
 };
 
 
