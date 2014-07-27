@@ -1,10 +1,4 @@
 <script>
-// $(function(){
-// iterate through each satellite creating it's own projection with the #{norad_id}path, set the rotation
-// based on the revolutions per day and set the angle by the right ascension. No need for specific pathing
-// as long as you can calculate the starting position along it's own equator. Completely eliminates the
-// need to make LineStrings with specific coordinates. You can then give a length of a line at a right
-// angle along it's own equator based on the speed of rotation, and give it a tail with a linear gradient.
 
 // eventual data format:
 // satellites = {
@@ -18,15 +12,14 @@
 
 
 
-var satellites = <%= @satellites.to_json.html_safe %>
 
+var satellites = <%= @satellites.to_json.html_safe %>
 // satellites = [satellites[0], satellites[1], satellites[2], satellites[3]]
 // satellites = [satellites[7]]
 
 satellites.forEach(function(d) {
   d.adjustedRAAN = getSiderealAscension(d);
   d.projectionOffset = getOffset(d)
-  console.log(d.projectionOffset)
 })
 
 
@@ -150,6 +143,15 @@ var stars = svg.append("g")
         .attr("d", function(d){ return starPath(d); })
         .attr("opacity", function(d){ return randOpacity(.35, 1) });
 
+/////////////// ATMOSPHERE /////////////////////
+var backgroundCircle = svg.append("svg:circle")
+    .attr('cx', centerW)
+    .attr('cy', centerH)
+    .attr('r', globeScale)
+    .attr('class', 'atmosphere')
+    .attr("filter", "url(#glow)")
+    .attr("fill", "url(#atmosphere-gradient)");
+
 
   ////////////// TOPO FEATURES /////////////////
 
@@ -200,23 +202,4 @@ queue()
     });
 };
 
-
-
-
-
-
-
-
-
-  ////////////////////////////// potential gradient //////////////////////
-
-// EARTH BACKGROUND FOR POTENTIAL ATMOSPHERE //
-var backgroundCircle = svg.append("svg:circle")
-    .attr('cx', centerW)
-    .attr('cy', centerH)
-    .attr('r', globeScale)
-    .attr('class', 'atmosphere')
-    .attr("filter", "url(#glow)")
-    .attr("fill", "url(#atmosphere-gradient)");
-// });
 </script>

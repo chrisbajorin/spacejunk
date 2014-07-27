@@ -31,7 +31,6 @@ function getOffset(satellite){
     var i1 = degToRad(-satellite.inclination),
         d = satellite.adjustedRAAN/360 * 40030,
         R = 6371;
-        console.log(d)
 
         // these are the full formulas. Since my starting point is [0,0], I elminated terms that evaluate to 0 or 1.
     // var φ2 = Math.asin( Math.sin(φ1)*Math.cos(d/R) + Math.cos(φ1)*Math.sin(d/R)*Math.cos(i1) );
