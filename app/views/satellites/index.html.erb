@@ -1,39 +1,28 @@
 <script>
-
-// eventual data format:
-// satellites = {
-//   "topoObject":makeSatelliteObject(),          //  topoJSON formatted satellite point. Need to add longitude start
-//   "satPath":satPath,                           //  Can add to satellite object to avoid making multiple arrays
-//   "satProjection":satProjection,               //  Same as satPath
-//   "adjustedRAAN": aR,
-//   "projectionOffset": [λ,φ],                   //  Used for satellite rotation timer
-//   "rotationVelocity":rotationVelocity          //  Longitudinal rotation speed, based on rotations per day
-// }
-
-
-
-
 var satellites = <%= @satellites.to_json.html_safe %>
 // satellites = [satellites[0], satellites[1], satellites[2], satellites[3]]
-// satellites = [satellites[7]]
+
 
 satellites.forEach(function(d) {
   d.adjustedRAAN = getSiderealAscension(d);
-  d.projectionOffset = getOffset(d)
+  d.projectionOffset = getOffset(d);
+  d.rotationVelocity = getVelocity(d);
 })
 
 
-var width = $(window).width(),
-    height = $(window).height(),
-    pi = Math.PI,
+var width = $(document).width(),
+    height = $(document).height(),
     t0 = Date.now(),
-    globeScale = (height)/2.8,  //
-    satScale = (height)/2.4,  // needs to be edited for accurate distance.
-    scaleRatio = globeScale/satScale,
+    globeScale = (height)/2.8,
+    scaleRatio = 1.1568,                              // assumes satellites have 1000km orbit height
+    satScale = globeScale*scaleRatio,
     starScale = height,
     centerH = height/2,
     centerW = width/2,
-    satClip = 90 + radToDeg(Math.acos(scaleRatio)); // auto adjust clip angle for satellites revolving around globe
+    satClip = 90 + radToDeg(Math.acos(1/scaleRatio)), // auto adjust clip angle for satellites revolving around globe
+    earthSpeed = 360/24/60/60,                        // rotation degrees per second
+    spdFactor = 24*10,                                // 24 = 1hour-day, 24*10 = 6minute-day, 24*60 = 1minute-day
+    displayTime;
 
 var svg = d3.select("body").append("svg")
     .attr("width", width)
@@ -75,7 +64,6 @@ satellites.forEach(function(d) {
   var satProjection = d3.geo.orthographic()
     .scale(satScale)
     .translate([centerW,centerH])
-    // .rotate([d.projectionOffset[0], d.projectionOffset[1], d.inclination]) // needs to be rotated along the haversine line
     .clipAngle(satClip);
 
 var satPath = d3.geo.path()
@@ -106,9 +94,9 @@ var starPath = d3.geo.path()
 
 ///////////// ROTATION /////////////
 // x-rotation
-var λ = d3.scale.linear()
-    .domain([0, width])
-    .range([-180, 180]);
+// var λ = d3.scale.linear()
+//     .domain([0, width])
+//     .range([-180, 180]);
 
 // y-rotation
 // var φ = d3.scale.linear()
@@ -181,14 +169,16 @@ queue()
         .attr("id", function(d, i) { return satellites[i].norad_id; })
         // .attr("xlink:href", "http://www.satview.org/imagens/satelite_icone_2.gif")
 
+    ////// ROTATION TIMER ///////////
     d3.timer(function() {
       var t = (Date.now()-t0)/1000;
-      projection.rotate([0 + 6*t, 0, 0]);
+      projection.rotate([0 + earthSpeed*spdFactor*t, 0, 0]);
       ocean.attr("d", path);
       land.attr("d", path);
 
+      // flipped latitude and longitude to deal with offset
       satProjections.forEach(function(d,i) {
-        d.rotate([satellites[i].projectionOffset[1] + rotationVelocity[0]*t, satellites[i].projectionOffset[0], satellites[i].inclination])
+        d.rotate([satellites[i].projectionOffset[1] + satellites[i].rotationVelocity*spdFactor*t, satellites[i].projectionOffset[0], satellites[i].inclination])
         d3.select($("#"+satellites[i].norad_id)[0]).attr("d", function(d) {
           return satPaths[i](d)
         });
@@ -201,5 +191,7 @@ queue()
       // });
     });
 };
+
+setInterval(timer, 1000/spdFactor);
 
 </script>

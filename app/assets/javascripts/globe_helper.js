@@ -20,17 +20,12 @@ function createStars(number){
     return data;
 }
 
-// equirectangular projection formula for latitude/longitude from inclination and starting point
-// reversed the haversine formula.  Deprecated.
-
-
-
 
 // satellite projection offset to adjust for RAAN
 function getOffset(satellite){
     var i1 = degToRad(-satellite.inclination),
-        d = satellite.adjustedRAAN/360 * 40030,
-        R = 6371;
+        d = satellite.adjustedRAAN/360 * 40074,
+        R = 6378;
 
         // these are the full formulas. Since my starting point is [0,0], I elminated terms that evaluate to 0 or 1.
     // var φ2 = Math.asin( Math.sin(φ1)*Math.cos(d/R) + Math.cos(φ1)*Math.sin(d/R)*Math.cos(i1) );
@@ -71,6 +66,12 @@ function getSiderealAscension(satellite) {
     return (satellite.right_asc + getMST()) % 360;
 }
 
+function getVelocity(satellite) {
+  var rpd = satellite.mean_motion
+  degreesPerDay = rpd*360
+  return degreesPerDay/86400
+}
+
 // degree/radian conversionss
 function degToRad(deg) {
     return deg*Math.PI/180;
@@ -83,3 +84,19 @@ function radToDeg(rad) {
 function randOpacity(min, max) {
   return Math.random() * (max - min) + min;
 }
+
+function timer() {
+  var currentTime = Date.now();
+  var timeElapsed = currentTime - t0;
+  displayTime = new Date(currentTime + timeElapsed * spdFactor)//.toUTCString()
+  year      = displayTime.getUTCFullYear();
+  mon       = displayTime.getUTCMonth() + 1;
+  dd        = displayTime.getUTCDate();
+  hh        = displayTime.getUTCHours();
+  mm        = displayTime.getUTCMinutes();
+
+  mm = ((mm < 10) ? "0" + mm : mm);
+  clock = year + "/" + mon + "/" + dd + " " + hh + ":" + mm + " UTC";
+};
+
+
