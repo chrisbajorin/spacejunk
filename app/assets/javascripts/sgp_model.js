@@ -1,7 +1,3 @@
-
-// just some astrophysics. No big deal.
-
-
 // formula source: http://celestrak.com/NORAD/documentation/spacetrk.pdf
 
 // epoch_date used in these calculations is since 1950.

@@ -1,6 +1,3 @@
-function randomLonLat() {
-    return [Math.random() * 360 - 180, Math.random() * 180 - 90];
-}
 
 // strangely, it creates stars
 function createStars(number){
@@ -27,7 +24,7 @@ function getOffset(satellite){
         d = satellite.adjustedRAAN/360 * 40074,
         R = 6378;
 
-        // these are the full formulas. Since my starting point is [0,0], I elminated terms that evaluate to 0 or 1.
+    //  // these are the full formulas. Since my starting point is [0,0], I eliminated terms that evaluate to 0 or 1.
     // var φ2 = Math.asin( Math.sin(φ1)*Math.cos(d/R) + Math.cos(φ1)*Math.sin(d/R)*Math.cos(i1) );
     // var λ2 = λ1 + Math.atan2(Math.sin(i1)*Math.sin(d/R)*Math.cos(φ1), Math.cos(d/R)-Math.sin(φ1)*Math.sin(φ2));
 
@@ -67,12 +64,11 @@ function getSiderealAscension(satellite) {
 }
 
 function getVelocity(satellite) {
-  var rpd = satellite.mean_motion
-  degreesPerDay = rpd*360
+  degreesPerDay = satellite.mean_motion*360
   return degreesPerDay/86400
 }
 
-// degree/radian conversionss
+// degree/radian conversions
 function degToRad(deg) {
     return deg*Math.PI/180;
 }
@@ -80,10 +76,11 @@ function radToDeg(rad) {
     return rad*180/Math.PI;
 }
 
-// random range for opacity
+// random with range for opacity
 function randOpacity(min, max) {
   return Math.random() * (max - min) + min;
 }
+
 
 function timer() {
   var currentTime = Date.now();
@@ -99,4 +96,6 @@ function timer() {
   clock = year + "/" + mon + "/" + dd + " " + hh + ":" + mm + " UTC";
 };
 
-
+function randomLonLat() {
+    return [Math.random() * 360 - 180, Math.random() * 180 - 90];
+}

@@ -41,14 +41,6 @@ var path = d3.geo.path()
 
 
 /////// SATELLITE PROJECTION ////////////
-// var satProjection = d3.geo.orthographic()
-//     .scale(satScale)
-//     .translate([centerW,centerH])
-//     .clipAngle(satClip);
-
-// var satPath = d3.geo.path()
-//     .projection(satProjection)
-//     .pointRadius(3);
 
   var satObjects = []
   satellites.forEach(function(d) {
@@ -90,32 +82,6 @@ var starProjection = d3.geo.azimuthalEquidistant()
 var starPath = d3.geo.path()
     .projection(starProjection)
     .pointRadius(Math.random() + 1)
-
-
-///////////// ROTATION /////////////
-// x-rotation
-// var λ = d3.scale.linear()
-//     .domain([0, width])
-//     .range([-180, 180]);
-
-// y-rotation
-// var φ = d3.scale.linear()
-//     .domain([0, height])
-//     .range([90, -90]);
-
-
-// svg.on("mousemove", function() {
-//   var p = d3.mouse(this);
-
-//   starProjection.rotate([-λ(p[0]), 0]);
-//   // satProjection.rotate([λ(p[0]), 0]);  // φ(p[1]) - for y-rotation
-//   projection.rotate([λ(p[0]), 0, 23]);
-
-//   svg.selectAll(".star").attr("d", starPath);
-//   svg.selectAll(".globe").attr("d", path);
-//   // svg.selectAll(".satellite").attr("d", satPath);
-//   // svg.selectAll(".revolution").attr("d", satPath);
-// });
 
 
 ////////////// STAR CREATION ////////////////
@@ -183,12 +149,6 @@ queue()
           return satPaths[i](d)
         });
       });
-      // satellites.forEach(function(d) {
-      //   // console.log(d)
-      //   (d.satProjection).rotate([d.right_asc + rotationVelocity[0]*t, 0, d.inclination]);
-      //   d.topoObject
-      //   d.satPath(d.topoObject);
-      // });
     });
 };
 

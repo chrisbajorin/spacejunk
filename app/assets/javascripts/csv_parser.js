@@ -4,7 +4,7 @@ function makeJSONsatellites() {
   var fs = require('fs'),
       data = fs.readFileSync("satellite_data.csv", 'utf8');
 
-  var objectData = parseCSV(data);
+  var satelliteObjects = parseCSV(data);
 
   function parseCSV(data) {
     var satArray = splitSats(data);
@@ -113,6 +113,6 @@ function makeJSONsatellites() {
     }
   }
 
-  fs.writeFileSync("satellites.json", JSON.stringify(things))
+  fs.writeFileSync("satellites.json", JSON.stringify(satelliteObjects))
 
 }
