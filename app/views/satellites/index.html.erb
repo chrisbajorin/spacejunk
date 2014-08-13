@@ -58,15 +58,15 @@ satellites.forEach(function(d) {
     .translate([centerW,centerH])
     .clipAngle(satClip);
 
-var satPath = d3.geo.path()
-    .projection(satProjection)
-    .pointRadius(5);
+  var satPath = d3.geo.path()
+      .projection(satProjection)
+      .pointRadius(5);
 
-    d.satPath = satPath;
-    d.satProjection = satProjection;
+  d.satPath = satPath;
+  d.satProjection = satProjection;
   satPaths.push(satPath);
   satProjections.push(satProjection);
-})
+});
 
 
 //////
@@ -104,7 +104,6 @@ var backgroundCircle = svg.append("svg:circle")
     .attr('r', globeScale)
     .attr('class', 'atmosphere')
     .attr("filter", "url(#glow)")
-    .attr("fill", "url(#atmosphere-gradient)");
 
 
   ////////////// TOPO FEATURES /////////////////
@@ -133,7 +132,6 @@ queue()
         .append("path")
         .attr("class", "satellite")
         .attr("id", function(d, i) { return satellites[i].norad_id; })
-        // .attr("xlink:href", "http://www.satview.org/imagens/satelite_icone_2.gif")
 
     ////// ROTATION TIMER ///////////
     d3.timer(function() {

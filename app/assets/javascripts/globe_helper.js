@@ -18,7 +18,7 @@ function createStars(number){
 }
 
 
-// satellite projection offset to adjust for RAAN
+// satellite projection offset to adjust for RAAN, manipulation of the haversine formula
 function getOffset(satellite){
     var i1 = degToRad(-satellite.inclination),
         d = satellite.adjustedRAAN/360 * 40074,
@@ -98,4 +98,32 @@ function timer() {
 
 function randomLonLat() {
     return [Math.random() * 360 - 180, Math.random() * 180 - 90];
+}
+
+// converts xyz coordinates to latitude/longitude/altitude
+function xyz_lla(X,Y,Z) {
+
+  // function based on closed form algorithm found in http://microem.ru/files/2012/08/GPS.G1-X-00006.pdf
+
+  var a  = 6378.137,
+      f  = 1/298.257223563,
+      b  = a*(1-f),
+      e1 = Math.sqrt( (a*a - b*b) / (a*a) ),
+      e2 = Math.sqrt( (a*a - b*b) / (b*b) ),
+      lng, lat, alt;
+
+  var p = Math.sqrt(X*X + Y*Y),
+      theta = Math.atan2(Z*a, p*b);
+
+  lng = Math.atan2(Y,X)
+  lat = Math.atan2(Z + e2*e2*b*Math.pow(Math.sin(theta), 3), p - e1*e1*a*Math.pow(Math.cos(theta),3))
+
+  var N = a / Math.sqrt(1 - e1*e1*Math.pow(Math.sin(lat),2))
+
+  alt = (p / Math.cos(lat)) - N
+
+  console.log(radToDeg(lng));
+  console.log(radToDeg(lat));
+  console.log(alt)
+  return [radToDeg(lng), radToDeg(lat), alt]
 }

@@ -71,10 +71,10 @@ sgpPositionVectors = function(sat) {
     omk = omS0 + ((3 * j2 * Math.cos(i0) * Math.sin(2 * uU)) / ( 2 * Math.pow(pL, 2) ));
     ik = i0 + ((3 * j2 * Math.cos(i0) * Math.sin(i0) * Math.cos(2 * uU)) / ( 2 * Math.pow(pL, 2) ));
 
-    // positions and vectors                    // cartesian coordinates
-    Mx = -(Math.sin(omk)*Math.cos(ik));         // x = R * cos(lat) * cos(lng) // ---- // lat = asin(z/R)
-    My = Math.cos(omk)*Math.cos(ik);            // y = R * cos(lat) * sin(lng) // ---- //  lng = atan2(y, x)
-    Mz = Math.sin(ik);                          // z = sin(lat)
+    // positions and vectors
+    Mx = -(Math.sin(omk)*Math.cos(ik));
+    My = Math.cos(omk)*Math.cos(ik);
+    Mz = Math.sin(ik);
 
     Nx = Math.cos(omk);
     Ny = Math.sin(omk);
