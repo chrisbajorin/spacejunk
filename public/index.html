@@ -1,0 +1,178 @@
+<html>
+<head>
+  <title>Satellites</title>
+  <link rel="stylesheet" href="stylesheets/styles.css">
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="http://d3js.org/queue.v1.min.js"></script>
+  <script src="http://d3js.org/topojson.v1.min.js"></script>
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="javascripts/scripts.js"></script>
+</head>
+<body>
+    <svg id="defs", height="0", width="0">
+        <defs>
+            <filter id="glow">
+                <feColorMatrix type="matrix"
+                    values=
+                    "0 0 0 0   0
+                     0 0 0 .2   0
+                     0 0 0 .5   0
+                     0 0 0 1   0"/>
+                <feGaussianBlur stdDeviation="35" result="coloredBlur"/>
+                <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+        </defs>
+    </svg>
+<script>
+
+var width = $(document).width(),
+    height = $(document).height(),
+    t0 = Date.now(),
+    globeScale = (height)/2.8,
+    scaleRatio = 1.1568,                              // assumes satellites have 1000km orbit height
+    satScale = globeScale*scaleRatio,
+    starScale = height,
+    centerH = height/2,
+    centerW = width/2,
+    satClip = 90 + radToDeg(Math.acos(1/scaleRatio)), // auto adjust clip angle for satellites revolving around globe
+    earthSpeed = 360/24/60/60,                        // rotation degrees per second
+    spdFactor = 24*10,                                // 24 = 1hour-day, 24*10 = 6minute-day, 24*60 = 1minute-day
+    satellites = [],
+    displayTime;
+
+$.getJSON("/satdata", function(data){
+  satellites = data;
+
+  satellites.forEach(function(d) {
+    d.adjustedRAAN = getSiderealAscension(d);
+    d.projectionOffset = getOffset(d);
+    d.rotationVelocity = getVelocity(d);
+  })
+
+
+  var svg = d3.select("body").append("svg")
+      .attr("width", width)
+      .attr("height", height);
+
+
+  ////////// GLOBE PROJECTION //////////////
+  var projection = d3.geo.orthographic()
+      .scale(globeScale)
+      .translate([centerW, centerH])
+      .rotate([0,0,0])
+      .clipAngle(90);
+
+  var path = d3.geo.path()
+      .projection(projection);
+
+
+  /////// SATELLITE PROJECTION ////////////
+
+    var satObjects = []
+    satellites.forEach(function(d) {
+      d.topoObject = makeSatelliteObject()
+      satObjects.push(makeSatelliteObject())
+    });
+
+  ///////
+
+  satellites.forEach(function(d) {
+    var satProjection = d3.geo.orthographic()
+      .scale(satScale)
+      .translate([centerW,centerH])
+      .clipAngle(satClip);
+
+    var satPath = d3.geo.path()
+        .projection(satProjection)
+        .pointRadius(5);
+
+    d.satPath = satPath;
+    d.satProjection = satProjection;
+  });
+
+
+  //////////// STAR BACKGROUND //////////////
+  var starProjection = d3.geo.azimuthalEquidistant()
+      .scale(height)
+      .translate([width/2,height/2])
+
+  var starPath = d3.geo.path()
+      .projection(starProjection)
+      .pointRadius(Math.random() + 1)
+
+
+  ////////////// STAR CREATION ////////////////
+  var starList = createStars(800);
+
+  var stars = svg.append("g")
+          .attr("id", "stars")
+      .selectAll("g")
+      .data(starList)
+      .enter()
+      .append("path")
+          .attr("class", "star")
+          .attr("d", function(d){ return starPath(d); })
+          .attr("opacity", function(d){ return randOpacity(.35, 1) });
+
+  /////////////// ATMOSPHERE /////////////////////
+  var backgroundCircle = svg.append("svg:circle")
+      .attr('cx', centerW)
+      .attr('cy', centerH)
+      .attr('r', globeScale)
+      .attr('class', 'atmosphere')
+      .attr("filter", "url(#glow)")
+
+
+    ////////////// TOPO FEATURES /////////////////
+
+  queue()
+      .defer(d3.json, "world.json")
+      .await(ready);
+
+  function ready(error, world){
+
+    var ocean = svg.append("path")
+        .datum(topojson.feature(world, world.objects.ocean))
+        .attr("class", "globe")
+        .attr("id", "ocean")
+        .attr("d", path);
+
+    var land = svg.append("path")
+        .datum(topojson.feature(world, world.objects.land))
+        .attr("class", "globe")
+        .attr("id", "land")
+        .attr("d", path);
+
+    var satElements = svg.selectAll("path.satellite")
+        .data(satObjects)
+        .enter()
+        .append("path")
+        .attr("class", "satellite")
+        .attr("id", function(d, i) { return satellites[i].norad_id; })
+
+
+    ////// ROTATION TIMER ///////////
+    d3.timer(function() {
+      var t = (Date.now()-t0)/1000;
+      projection.rotate([0 + earthSpeed*spdFactor*t, 0, 0]);
+      ocean.attr("d", path);
+      land.attr("d", path);
+
+      // flipped latitude and longitude to deal with offset
+      satellites.forEach(function(d,i){
+        d.satProjection.rotate([d.projectionOffset[1] + d.rotationVelocity*spdFactor*t, d.projectionOffset[0], d.inclination])
+        d3.select($("#"+d.norad_id)[0]).attr("d", function(sat) {
+          return d.satPath(sat);
+        });
+      });
+    });
+  };
+
+  setInterval(timer, 1000/spdFactor);
+})
+</script>
+</body>
+</html>

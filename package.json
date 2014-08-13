@@ -1,0 +1,10 @@
+{
+  "name": "space-junk",
+  "description": "App modeling satellites with decaying orbits",
+  "version": "0.0.1",
+  "dependencies": {
+    "express": "^4.8.3",
+    "mongodb": "^1.4.8",
+    "mongoose": "^3.8.14"
+  }
+}
