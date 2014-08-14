@@ -2,7 +2,11 @@
   "name": "space-junk",
   "description": "App modeling satellites with decaying orbits",
   "version": "0.0.1",
+  "main": "app.js",
   "dependencies": {
     "express": "^4.8.3"
+  },
+  "engines": {
+    "node": "0.10.x"
   }
 }
