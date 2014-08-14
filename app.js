@@ -3,7 +3,7 @@ var express = require("express"),
     router = express.Router(),
     fs = require("fs");
 
-var satdata = fs.readFileSync("./public/satellites.json", "utf8");
+var satdata = fs.readFileSync("./data/satellites.json", "utf8");
 
 var server = app.listen(3000, function() {
   console.log("listening on port %d", server.address().port)
