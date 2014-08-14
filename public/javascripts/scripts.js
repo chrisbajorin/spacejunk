@@ -34,18 +34,6 @@ function getOffset(satellite){
 };
 
 
-// creates the orbital path line object for a given satellite
-// function makeGeoObject(positionArray) {
-//         var object = {
-//             "type":"Feature",
-//             "geometry":{
-//                 "type":"LineString",
-//                 "coordinates": positionArray
-//             }
-//         };
-//         return object;
-// }
-
 
 // random position along 'equator' of the individual satellite path
 function makeSatelliteObject() {
