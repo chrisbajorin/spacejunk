@@ -1,6 +1,5 @@
 var express = require("express"),
     app = express(),
-    router = express.Router(),
     fs = require("fs");
 
 var satdata = fs.readFileSync("./data/satellites.json", "utf8");

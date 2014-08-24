@@ -22,7 +22,8 @@ function createJSON(satArray) {
   satArray.forEach(function(d) {
     var name, norad_id,launch_date, epoch_date, b_star,
     inclination, RAAN, MST_RAAN, eccentricity, perigee,
-    mean_anomaly, mean_motion, orbit_number,
+    mean_anomaly, mean_motion, orbit_number, mean_motion_dot,
+    mean_motion_ddot,
     sat = {};
 
     var threeLine = d.split(/\n/),
@@ -34,8 +35,8 @@ function createJSON(satArray) {
     sat.norad_id          = line1[1].substr(0,5);
     sat.launch_date       = launchDate(line1[2], 0);
     sat.epoch_date        = epochDate(line1[3]);
-    sat.first_derivative  = firstDerivative(line1[4]);
-    sat.second_derivative = secondDerivative(line1[5]);
+    sat.mean_motion_dot   = firstDerivative(line1[4]);
+    sat.mean_motion_ddot  = secondDerivative(line1[5]);
     sat.b_star            = secondDerivative(line1[6]);
     sat.inclination       = Number(line2[2]);
     sat.RAAN              = Number(line2[3]);
