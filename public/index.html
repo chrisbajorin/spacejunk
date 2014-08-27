@@ -23,17 +23,21 @@
   var renderer, scene, camera, geometry, material, earthMesh,
       light, controls;
 
-  var satellites;
+  var satellites, satTarget;
 
-  var tracking = false;
+  var tracking = false,
+      center = new THREE.Vector3();
+
+  var priorTime = timeStart,
+      elapsed = 0;
 
 $.getJSON("/satdata", function(data){
 
   satellites = data;
-
   satellites.forEach(function(sat){
     sat.minSinceEpoch = (timeStart - JulianToUnix(sat.epoch_date)/1000)/60
-  })
+  });
+  satTarget = satellites[0];
 
   function init() {
     renderer = new THREE.WebGLRenderer();
@@ -44,6 +48,15 @@ $.getJSON("/satdata", function(data){
     scene  = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(65, WIDTH/HEIGHT, 1, 500000);
     camera.position.z = earthRadius * 3;
+    scene.add(camera)
+
+
+    // neck = new THREE.Object3D();
+    // neck.position.z = earthRadius * 3;
+    // neck.rotateOnAxis(new THREE.Vector3(1, 0, 0), 90*toRad);
+    // neck.add(camera);
+    // scene.add(neck);
+
 
     // create earth
     geometry                = new THREE.SphereGeometry(earthRadius, 50, 50);
@@ -54,13 +67,12 @@ $.getJSON("/satdata", function(data){
     material.specularMap    = THREE.ImageUtils.loadTexture("images/earthspec1k.jpg");
     material.specular       = new THREE.Color("grey");
     earthMesh               = new THREE.Mesh(geometry, material);
+
     earthMesh.rotateY(-Math.PI/2)     // aligns to [0,0]
     scene.add(earthMesh)
 
     // light
     scene.add(new THREE.AmbientLight(0x888888));
-
-
     light = new THREE.DirectionalLight(0xcccccc, .6);
     light.position.set(-1000000,432738.64224742586,0);         // Creates 23.4 degree angle of axial tilt
     scene.add(light);
@@ -68,46 +80,61 @@ $.getJSON("/satdata", function(data){
     // satellites
     satSphere = new THREE.SphereGeometry(60);
     satellites.forEach(function(sat) {
-      sat.satMesh   = new THREE.Mesh(satSphere, new THREE.MeshBasicMaterial({ color: 0x87c540 }))
-      scene.add(sat.satMesh)
+      sat.satMesh   = new THREE.Mesh(satSphere, new THREE.MeshBasicMaterial({ color: 0x87c540 }));
+      scene.add(sat.satMesh);
     })
 
     // mouse controls
-    controls = new THREE.OrbitControls(camera, renderer.domElement)
-  }
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-  var current,
-      priorTime = timeStart,
-      previous = 0;
+    // resize
+    window.addEventListener('resize', function() {
+      var WIDTH = window.innerWidth,
+          HEIGHT = window.innerHeight;
+
+      renderer.setSize(WIDTH, HEIGHT);
+      camera.aspect = WIDTH / HEIGHT;
+      camera.updateProjectionMatrix();
+    });
+  }
 
   function render() {
     timeNow = Date.now() / 1000;
     delta   = timeNow - priorTime;
     satellites.forEach(function(sat){
-      var location = sgp(sat, sat.minSinceEpoch + previous + delta*speedFactor)
+      var location = sgp(sat, sat.minSinceEpoch + elapsed + delta*speedFactor);
       sat.satMesh.position.x = location.X;
       sat.satMesh.position.y = location.Y;
       sat.satMesh.position.z = location.Z;
-    })
+    });
 
     if (tracking == true) {
-      var camLocation = sgp(satellites[0], satellites[0].minSinceEpoch + previous + delta*speedFactor)
-      camera.position.x = camLocation.X*2
-      camera.position.y = camLocation.Y*2
-      camera.position.z = camLocation.Z*2
+      var camLocation = sgp(satTarget, satTarget.minSinceEpoch + elapsed + delta*speedFactor);
+      var trackPosition = new THREE.Vector3(camLocation.X - 600*camLocation.XDOT,camLocation.Y - 600*camLocation.YDOT,camLocation.Z - 600*camLocation.ZDOT);
+      var trackTarget = new THREE.Vector3(camLocation.X + 1000*camLocation.XDOT,camLocation.Y + 1000*camLocation.YDOT,camLocation.Z + 1000*camLocation.ZDOT);
+      var latitude = XYZtoLLA(camLocation.X,camLocation.Y,camLocation.Z).latitude;
+      /*****/
+      camera.up = new THREE.Vector3(10*camLocation.X, 10*camLocation.Y, 10*camLocation.Z);
+      /*****/
+      camera.lookAt(trackTarget);
+      camera.position.copy(trackPosition);
+    } else {
+      camera.lookAt(center);
     }
 
     earthMesh.rotateY(speedFactor * 2 * Math.PI * delta / 1440 );        // 1 rpm = 2 * Math.PI / 60 * delta
     renderer.render(scene, camera);
-    previous  = previous + delta*speedFactor
+    elapsed  = elapsed + delta*speedFactor;
     priorTime = timeNow;
   }
+
 
   function animate() {
     requestAnimationFrame(animate);
     render();
     controls.update();
   }
+
 
   init();
   animate();

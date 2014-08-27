@@ -22,7 +22,7 @@ THREE.OrbitControls = function ( object, domElement ) {
   this.userRotate = true;
   this.userRotateSpeed = 0.70;
 
-  this.userPan = true;
+  this.userPan = false;
   this.userPanSpeed = 2.0;
 
   this.autoRotate = false;
@@ -187,7 +187,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
     position.copy( this.center ).add( offset );
 
-    this.object.lookAt( this.center );
+    // this.object.lookAt( this.center );
 
     thetaDelta = 0;
     phiDelta = 0;

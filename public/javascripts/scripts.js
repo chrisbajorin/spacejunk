@@ -41,3 +41,51 @@ function getMST() {
     }
     return GMST;
 }
+
+/////////////////
+
+var a  = 6378.137,
+    f  = 1/298.257223563,
+    b  = a*(1-f),
+    e1 = Math.sqrt( (a*a - b*b) / (a*a) ),
+    e2 = Math.sqrt( (a*a - b*b) / (b*b) ),
+    toDeg = 180 / Math.PI,
+    toRad = Math.PI / 180;
+
+
+function XYZtoLLA(X, Y, Z) {
+
+  var p, theta, lng, lat, N, alt;
+
+  p = Math.sqrt(X*X + Y*Y);
+  theta = Math.atan2(Z*a, p*b);
+  lng = Math.atan2(Y,X)
+  lat = Math.atan2(Z + e2*e2*b*Math.pow(Math.sin(theta), 3), p - e1*e1*a*Math.pow(Math.cos(theta),3))
+  N   = a / Math.sqrt(1 - e1*e1*Math.pow(Math.sin(lat),2))
+  alt = (p / Math.cos(lat)) - N
+
+  return {"longitude": (lng*toDeg + 360) % 360, "latitude": lat*toDeg, "altitude": alt};
+}
+
+
+function LLAtoXYZ(lng, lat, alt) {
+
+  var X, Y, Z, N,
+      toRad  = Math.PI / 180
+      coslng = Math.cos(lng*toRad),
+      coslat = Math.cos(lat*toRad)
+      sinlng = Math.sin(lng*toRad),
+      sinlat = Math.sin(lat*toRad),
+      boa    = (b*b)/(a*a);
+
+  N = a / Math.sqrt(1 - e1*e1*Math.pow(sinlat,2))
+  X = (N + alt) * coslat * coslng
+  Y = (N + alt) * coslat * sinlng
+  Z = (boa*N + alt) * sinlat
+
+  return {"X": X, "Y": Y, "Z": Z};
+}
+//////////////////
+function setSatTarget(x) {
+  satTarget = satellites[x];
+}
