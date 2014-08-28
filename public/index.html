@@ -46,17 +46,9 @@ $.getJSON("/satdata", function(data){
     document.body.appendChild(renderer.domElement);
 
     scene  = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(65, WIDTH/HEIGHT, 1, 500000);
+    camera = new THREE.PerspectiveCamera(45, WIDTH/HEIGHT, 1, 500000);
     camera.position.z = earthRadius * 3;
     scene.add(camera)
-
-
-    // neck = new THREE.Object3D();
-    // neck.position.z = earthRadius * 3;
-    // neck.rotateOnAxis(new THREE.Vector3(1, 0, 0), 90*toRad);
-    // neck.add(camera);
-    // scene.add(neck);
-
 
     // create earth
     geometry                = new THREE.SphereGeometry(earthRadius, 50, 50);
@@ -78,7 +70,7 @@ $.getJSON("/satdata", function(data){
     scene.add(light);
 
     // satellites
-    satSphere = new THREE.SphereGeometry(60);
+    satSphere = new THREE.SphereGeometry(30);
     satellites.forEach(function(sat) {
       sat.satMesh   = new THREE.Mesh(satSphere, new THREE.MeshBasicMaterial({ color: 0x87c540 }));
       scene.add(sat.satMesh);
@@ -113,12 +105,13 @@ $.getJSON("/satdata", function(data){
       var trackPosition = new THREE.Vector3(camLocation.X - 600*camLocation.XDOT,camLocation.Y - 600*camLocation.YDOT,camLocation.Z - 600*camLocation.ZDOT);
       var trackTarget = new THREE.Vector3(camLocation.X + 1000*camLocation.XDOT,camLocation.Y + 1000*camLocation.YDOT,camLocation.Z + 1000*camLocation.ZDOT);
       var latitude = XYZtoLLA(camLocation.X,camLocation.Y,camLocation.Z).latitude;
-      /*****/
+
+      // aligns the camera with the earth underneath
       camera.up = new THREE.Vector3(10*camLocation.X, 10*camLocation.Y, 10*camLocation.Z);
-      /*****/
       camera.lookAt(trackTarget);
       camera.position.copy(trackPosition);
     } else {
+      camera.up = new THREE.Vector3(0,1,0)
       camera.lookAt(center);
     }
 
