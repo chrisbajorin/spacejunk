@@ -8,8 +8,8 @@ function sgp(satellite, TSINCE) {
       EO     = satellite.eccentricity,
       XINCL  = satellite.inclination*toRad,
       XMO    = satellite.mean_anomaly*toRad,
-      OMEGAO = satellite.perigee*toRad,          // lowercase omega
-      XNODEO = satellite.RAAN*toRad,             // uppercase omega
+      OMEGAO = satellite.perigee*toRad,              // lowercase omega
+      XNODEO = satellite.RAAN*toRad,                 // uppercase omega
       XND1   = satellite.mean_motion_dot,
       XND2   = satellite.mean_motion_ddot,
       CK2    = 5.41308e-4,                           // = 1/2 * J2 AE^2

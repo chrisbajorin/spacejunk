@@ -31,8 +31,7 @@ function getMST() {
     var jd = b + c + d - 730550.5 + day + (hour + minute/60.0 + second/3600.0)/24.0;
     var jt   = jd/36525.0;                   // julian centuries since J2000.0
     var GMST = 280.46061837 + 360.98564736629*jd + 0.000387933*jt*jt - jt*jt*jt/38710000;
-    if ( GMST > 0.0 )
-    {
+    if ( GMST > 0.0 ) {
         while( GMST > 360.0 )
             GMST -= 360.0;
     } else {
@@ -59,10 +58,10 @@ function XYZtoLLA(X, Y, Z) {
 
   p = Math.sqrt(X*X + Y*Y);
   theta = Math.atan2(Z*a, p*b);
-  lng = Math.atan2(Y,X)
-  lat = Math.atan2(Z + e2*e2*b*Math.pow(Math.sin(theta), 3), p - e1*e1*a*Math.pow(Math.cos(theta),3))
-  N   = a / Math.sqrt(1 - e1*e1*Math.pow(Math.sin(lat),2))
-  alt = (p / Math.cos(lat)) - N
+  lng = Math.atan2(Y,X);
+  lat = Math.atan2(Z + e2*e2*b*Math.pow(Math.sin(theta), 3), p - e1*e1*a*Math.pow(Math.cos(theta),3));
+  N   = a / Math.sqrt(1 - e1*e1*Math.pow(Math.sin(lat),2));
+  alt = (p / Math.cos(lat)) - N;
 
   return {"longitude": (lng*toDeg + 360) % 360, "latitude": lat*toDeg, "altitude": alt};
 }
@@ -71,21 +70,34 @@ function XYZtoLLA(X, Y, Z) {
 function LLAtoXYZ(lng, lat, alt) {
 
   var X, Y, Z, N,
-      toRad  = Math.PI / 180
+      toRad  = Math.PI / 180,
       coslng = Math.cos(lng*toRad),
-      coslat = Math.cos(lat*toRad)
+      coslat = Math.cos(lat*toRad),
       sinlng = Math.sin(lng*toRad),
       sinlat = Math.sin(lat*toRad),
       boa    = (b*b)/(a*a);
 
-  N = a / Math.sqrt(1 - e1*e1*Math.pow(sinlat,2))
-  X = (N + alt) * coslat * coslng
-  Y = (N + alt) * coslat * sinlng
-  Z = (boa*N + alt) * sinlat
+  N = a / Math.sqrt(1 - e1*e1*Math.pow(sinlat,2));
+  X = (N + alt) * coslat * coslng;
+  Y = (N + alt) * coslat * sinlng;
+  Z = (boa*N + alt) * sinlat;
 
   return {"X": X, "Y": Y, "Z": Z};
 }
 //////////////////
 function setSatTarget(x) {
   satTarget = satellites[x];
+}
+
+function degToTime(deg) {
+  var totalSec = Math.floor(deg/360*86400);
+  var hh       = Math.floor(totalSec/3600);
+  var mm       = Math.floor((totalSec-(hh*60*60))/60)
+  var ss       = Math.floor((totalSec-(hh*60*60)-(mm*60)))
+  return checkTime(hh) + ":" + checkTime(mm) + ":" + checkTime(ss);
+}
+
+function checkTime(ii) {
+  if (ii < 10) { ii = "0" + ii; };
+  return ii;
 }

@@ -10,15 +10,21 @@
 </head>
 <body>
 
+  <div id="details">
+    <ul id="satellites"></ul>
+  </div>
+
+
 <script>
 
-  // init
+  // init variables
   var HEIGHT   = window.innerHeight,
       WIDTH    = window.innerWidth;
 
   var earthRadius = 6371,
       timeStart   = Date.now() / 1000,
-      speedFactor = 4;                  // 24: 1day == 1min
+      siderealTime = getMST() * Math.PI / 180,
+      speedFactor = 4;                  // 24: 1day == 1min, 4: 1day = 6min
 
   var renderer, scene, camera, geometry, material, earthMesh,
       light, controls;
@@ -32,6 +38,7 @@
       elapsed = 0;
 
 $.getJSON("/satdata", function(data){
+  // ajax call for satellite objects
 
   satellites = data;
   satellites.forEach(function(sat){
@@ -40,17 +47,17 @@ $.getJSON("/satdata", function(data){
   satTarget = satellites[0];
 
   function init() {
+    // initialize WebGL objects
+
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(WIDTH, HEIGHT);
-    renderer.shadowMapEnabled = true;
     document.body.appendChild(renderer.domElement);
-
     scene  = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, WIDTH/HEIGHT, 1, 500000);
     camera.position.z = earthRadius * 3;
     scene.add(camera)
 
-    // create earth
+    // EARTH
     geometry                = new THREE.SphereGeometry(earthRadius, 50, 50);
     material                = new THREE.MeshPhongMaterial();
     material.map            = THREE.ImageUtils.loadTexture("images/earthmap1k.jpg");
@@ -60,26 +67,28 @@ $.getJSON("/satdata", function(data){
     material.specular       = new THREE.Color("grey");
     earthMesh               = new THREE.Mesh(geometry, material);
 
-    earthMesh.rotateY(-Math.PI/2)     // aligns to [0,0]
+    earthMesh.rotateY(-Math.PI/2 + siderealTime)              // aligns to [0,0] and then adjusts to sidereal time
     scene.add(earthMesh)
 
-    // light
+    // LIGHT
     scene.add(new THREE.AmbientLight(0x888888));
     light = new THREE.DirectionalLight(0xcccccc, .6);
-    light.position.set(-1000000,432738.64224742586,0);         // Creates 23.4 degree angle of axial tilt
+    light.position.set(-1000000,432738.64224742586,0);        // Creates 23.4 degree angle of axial tilt
     scene.add(light);
 
-    // satellites
+    // SATELLITES
     satSphere = new THREE.SphereGeometry(30);
     satellites.forEach(function(sat) {
+      // creates each satellite sphere
+
       sat.satMesh   = new THREE.Mesh(satSphere, new THREE.MeshBasicMaterial({ color: 0x87c540 }));
       scene.add(sat.satMesh);
     })
 
-    // mouse controls
+    // MOUSE CONTROLS
     controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-    // resize
+    // WINDOW RESIZE
     window.addEventListener('resize', function() {
       var WIDTH = window.innerWidth,
           HEIGHT = window.innerHeight;
@@ -93,7 +102,11 @@ $.getJSON("/satdata", function(data){
   function render() {
     timeNow = Date.now() / 1000;
     delta   = timeNow - priorTime;
+
     satellites.forEach(function(sat){
+      // the sgp() function accepts the second argument in the form of minutes
+      // since delta is calculated in seconds, the function calculates time as
+      // 1 satellite minute = 1 browser second
       var location = sgp(sat, sat.minSinceEpoch + elapsed + delta*speedFactor);
       sat.satMesh.position.x = location.X;
       sat.satMesh.position.y = location.Y;
@@ -101,26 +114,29 @@ $.getJSON("/satdata", function(data){
     });
 
     if (tracking == true) {
+      // checks for tracking flag which is triggered on click from the satellite list(not yet implemented)
+
       var camLocation = sgp(satTarget, satTarget.minSinceEpoch + elapsed + delta*speedFactor);
       var trackPosition = new THREE.Vector3(camLocation.X - 600*camLocation.XDOT,camLocation.Y - 600*camLocation.YDOT,camLocation.Z - 600*camLocation.ZDOT);
       var trackTarget = new THREE.Vector3(camLocation.X + 1000*camLocation.XDOT,camLocation.Y + 1000*camLocation.YDOT,camLocation.Z + 1000*camLocation.ZDOT);
-      var latitude = XYZtoLLA(camLocation.X,camLocation.Y,camLocation.Z).latitude;
 
       // aligns the camera with the earth underneath
       camera.up = new THREE.Vector3(10*camLocation.X, 10*camLocation.Y, 10*camLocation.Z);
       camera.lookAt(trackTarget);
       camera.position.copy(trackPosition);
     } else {
-      camera.up = new THREE.Vector3(0,1,0)
+      // resets the up angle, re-initializing the orbit controls
+      camera.up = new THREE.Vector3(0,1,0);
       camera.lookAt(center);
     }
-
-    earthMesh.rotateY(speedFactor * 2 * Math.PI * delta / 1440 );        // 1 rpm = 2 * Math.PI / 60 * delta
+    // 1 rotation per second = 2 * Math.PI * delta
+    // 2*pi*delta/1440 is setting 1 real-life minute
+    // equal to 1 second with speedFactor = 1
+    earthMesh.rotateY(speedFactor * 2 * Math.PI * delta / 1440 );
     renderer.render(scene, camera);
     elapsed  = elapsed + delta*speedFactor;
     priorTime = timeNow;
   }
-
 
   function animate() {
     requestAnimationFrame(animate);
@@ -128,9 +144,12 @@ $.getJSON("/satdata", function(data){
     controls.update();
   }
 
-
   init();
   animate();
+
+  // satellites.forEach(function(sat){
+  //   $("#satellites").append("<li id="+sat.norad_id+">" + sat.name + "</li>");
+  // })
 });
 </script>
 </body>
