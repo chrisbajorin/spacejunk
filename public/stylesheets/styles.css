@@ -4,4 +4,9 @@ body {
 
 #details {
   position: absolute;
+  overflow: auto;
+}
+
+#satellites {
+  color: white;
 }
