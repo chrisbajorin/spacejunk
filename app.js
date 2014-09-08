@@ -4,7 +4,7 @@ var express = require("express"),
 
 var satdata = fs.readFileSync("./data/satellites.json", "utf8");
 
-var port = process.env.PORT || 3000
+var port = process.env.PORT || 3000;
 
 var server = app.listen(port, function() {
   console.log("listening on port %d", server.address().port)
