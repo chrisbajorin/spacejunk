@@ -31,7 +31,7 @@ THREE.OrbitControls = function ( object, domElement ) {
   this.minPolarAngle = 0; // radians
   this.maxPolarAngle = Math.PI; // radians
 
-  this.minDistance = 10000;
+  this.minDistance = 12000;
   this.maxDistance = 120000;
 
   // 65 /*A*/, 83 /*S*/, 68 /*D*/
