@@ -2,34 +2,34 @@
   "name": "space-junk",
   "description": "App modeling satellites with decaying orbits",
   "version": "0.0.1",
-  "main": "app.js",
+  "main": "server.js",
   "dependencies": {
-    "bower": "^1.3.11",
-    "express": "^4.8.3",
+    "bower": "~1.3.11",
+    "express": "~4.9.0",
     "logfmt": "^1.1.2",
-    "mongoose": "~3.8.8",
-    "mongoose-auto-increment": "^3.0.4",
-    "connect-mongo": "~0.4.0"
+    "mongoose": "~3.8.16",
+    "connect-mongo": "~0.4.0",
+    "lodash": "~2.4.1"
   },
   "engines": {
     "node": "0.10.x",
     "npm": "1.4.x"
   },
   "devDependencies": {
-    "chai": "^1.9.1",
+    "chai": "~1.9.1",
     "connect-livereload": "~0.3.0",
     "grunt": "~0.4.5",
-    "grunt-concurrent": "~0.3.0",
-    "grunt-contrib-clean": "~0.5.0",
-    "grunt-contrib-concat": "~0.3.0",
     "grunt-contrib-connect": "~0.5.0",
-    "grunt-contrib-copy": "~0.4.1",
     "grunt-contrib-jshint": "~0.6.3",
     "grunt-contrib-watch": "~0.5.2",
-    "grunt-env": "^0.4.1",
+    "grunt-env": "~0.4.1",
     "grunt-express-server": "~0.4.2",
-    "grunt-karma": "^0.8.3",
-    "grunt-mocha-test": "^0.11.0",
+    "grunt-mocha-test": "~0.11.0",
     "grunt-mongo-backup": "0.0.2"
-  }
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Chris Bajorin (cdbajorin)",
+  "license": "MIT"
 }
