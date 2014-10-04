@@ -56,12 +56,12 @@ require('./lib/config/express')(app);
 
 // require('./lib/api_routes')(app);
 
-require('/lib/app_routes')(app);
+require('./lib/app_routes')(app);
 
 // db logging
-if (app.settings.env === 'local') {
-  mongoose.set('debug', true);
-}
+// if (app.settings.env === 'local') {
+//   mongoose.set('debug', true);
+// }
 
 // startup
 app.listen(config.port, function () {
@@ -69,4 +69,4 @@ app.listen(config.port, function () {
 });
 
 // expose app
-exports = modules.exports = app;
+exports = module.exports = app;
