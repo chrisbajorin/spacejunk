@@ -1,22 +1,3 @@
-
-// var express = require("express"),
-//     app = express(),
-//     fs = require("fs");
-
-// var satdata = fs.readFileSync("./data/satellites.json", "utf8");
-
-// var port = process.env.PORT || 3000;
-
-// var server = app.listen(port, function() {
-//   console.log("listening on port %d", server.address().port)
-// })
-
-// app.use(express.static(__dirname + '/public'));
-
-// app.get("/satdata", function(req,res){
-//   res.json(JSON.parse(satdata))
-// })
-
 'use strict';
 
 var express = require('express');
@@ -59,9 +40,9 @@ require('./lib/config/express')(app);
 require('./lib/app_routes')(app);
 
 // db logging
-// if (app.settings.env === 'local') {
-//   mongoose.set('debug', true);
-// }
+if (app.settings.env === 'local') {
+  mongoose.set('debug', true);
+}
 
 // startup
 app.listen(config.port, function () {
