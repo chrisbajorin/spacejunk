@@ -41,6 +41,15 @@ module.exports = function (grunt) {
       }
     },
 
+    execute: {
+      parse: {
+        options: {
+          cwd: './lib/util'
+        },
+        src: ['./lib/util/parser.js']
+      }
+    },
+
     env: {
       local: {
         NODE_ENV: 'local'
@@ -49,11 +58,17 @@ module.exports = function (grunt) {
 
   });
 
+  grunt.registerTask('parse', 'parsing csv data', [
+    // 'env:local',
+    // 'express:dev',
+    'execute:parse'
+  ]);
+
   grunt.registerTask('workon', 'start work on project', [
     'jshint',
     'env:local',
     'express:dev',
     'watch'
-    ]);
+  ]);
 
 };
