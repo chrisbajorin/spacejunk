@@ -6,24 +6,19 @@ var Satellite = require('Satellite');
 var config = require('../../lib/config/config');
 var path = require('path');
 var fs = require('fs');
-var modelsPath = path.join(__dirname, './lib/models');
-fs.readdirSync(modelsPath).forEach( function (file) {
-  if (/(.*)\.(js$)/.test(file)) {
-    require(modelsPath + '/' + file);
-  };
-});
+var app = require('../../server');
 
 
 describe('Satellite insertion', function () {
-  before(function (done) {
-    mongoose.connect(config.mongo.uri, config.mongo.options);
-    done();
-  });
+  // before(function (done) {
+  //   // mongoose.connect(config.mongo.uri, config.mongo.options);
+  //   done();
+  // });
 
-  after(function(done) {
-    mongoose.disconnect();
-    done();
-  });
+  // after(function (done) {
+  //   // mongoose.disconnect();
+  //   done();
+  // });
 
   it('connects to the database', function (done) {
     Satellite.find({}, function (err, result) {
@@ -32,6 +27,6 @@ describe('Satellite insertion', function () {
       console.log(result);
       done();
     });
+  });
 
-  })
-})
+});

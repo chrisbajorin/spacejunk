@@ -65,7 +65,7 @@ module.exports = function (grunt) {
           reporter: 'spec',
           colors: true
         },
-        src: ['./test/parse/*.js']
+        src: ['./test/parser/*.js']
       }
     },
 
