@@ -118,7 +118,8 @@ module.exports = function (grunt) {
     if (target === 'parse') {
       return grunt.task.run([
         'env:test',
-        'express:dev',
+        'testbackup:restore',
+        // 'express:dev',
         'mochaTest:parse'
       ]);
     }
@@ -129,7 +130,7 @@ module.exports = function (grunt) {
     var args = [];
     var baseArgs = ['--host=localhost', '--port=27017', '--db=sj-test'];
     var restoreArgs = ['--drop', './dump/sj-test'];
-    var dumpArgs = ['-o ./dump'];
+    var dumpArgs = ['--out=./dump'];
 
     if (task === 'dump') {
       args = baseArgs.concat(dumpArgs);
