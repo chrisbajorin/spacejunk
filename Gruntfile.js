@@ -53,13 +53,16 @@ module.exports = function (grunt) {
     env: {
       local: {
         NODE_ENV: 'local'
+      },
+      test: {
+        NODE_ENV: 'test'
       }
     }
 
   });
 
   grunt.registerTask('parse', 'parsing csv data', [
-    // 'env:local',
+    'env:local',
     // 'express:dev',
     'execute:parse'
   ]);
@@ -70,5 +73,14 @@ module.exports = function (grunt) {
     'express:dev',
     'watch'
   ]);
+
+  grunt.registerTask('test', function(target) {
+    if (target === 'parse') {
+      return grunt.task.run([
+        'env:test',
+        'mochaTest:parse'
+        ]);
+    }
+  });
 
 };
