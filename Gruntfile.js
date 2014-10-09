@@ -41,19 +41,46 @@ module.exports = function (grunt) {
       }
     },
 
+    execute: {
+      parse: {
+        options: {
+          cwd: './lib/util'
+        },
+        src: ['./lib/util/parser.js']
+      }
+    },
+
     env: {
       local: {
         NODE_ENV: 'local'
+      },
+      test: {
+        NODE_ENV: 'test'
       }
     }
 
   });
+
+  grunt.registerTask('parse', 'parsing csv data', [
+    'env:local',
+    // 'express:dev',
+    'execute:parse'
+  ]);
 
   grunt.registerTask('workon', 'start work on project', [
     'jshint',
     'env:local',
     'express:dev',
     'watch'
-    ]);
+  ]);
+
+  grunt.registerTask('test', function(target) {
+    if (target === 'parse') {
+      return grunt.task.run([
+        'env:test',
+        'mochaTest:parse'
+        ]);
+    }
+  });
 
 };

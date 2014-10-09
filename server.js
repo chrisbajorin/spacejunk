@@ -23,8 +23,8 @@ app.use(function (req, res, next) {
 
 // grab models
 
-var modelsPath = path.join(__dirname, 'lib/models');
-fs.readdirSync(modelsPath).forEach(function (file) {
+var modelsPath = path.join(__dirname, './lib/models');
+fs.readdirSync(modelsPath).forEach( function (file) {
   if (/(.*)\.(js$)/.test(file)) {
     require(modelsPath + '/' + file);
   };
