@@ -1,5 +1,5 @@
 {
-  "name": "space-junk",
+  "name": "spacejunk",
   "description": "App modeling satellites with decaying orbits",
   "version": "0.0.1",
   "main": "server.js",

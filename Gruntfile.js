@@ -28,7 +28,8 @@ module.exports = function (grunt) {
       },
       files: [
         'gruntfile.js',
-        'lib/**/*.js'
+        'lib/**/*.js',
+          'lib/*.js'
       ]
     },
 
@@ -62,10 +63,11 @@ module.exports = function (grunt) {
     mochaTest: {
       parse: {
         options: {
+          require: './test/globals/globals.js',
           reporter: 'spec',
           colors: true
         },
-        src: ['./test/parser/*.js']
+        src: ['./test/test/**/*.js']
       }
     },
 
@@ -75,7 +77,7 @@ module.exports = function (grunt) {
         port: '27017',
         db : 'sj-local',
         dump: {
-          out : './dump',
+          out : './dump'
         },
         restore:{
           path : './dump/sj-local',
@@ -90,7 +92,7 @@ module.exports = function (grunt) {
         port: '27017',
         db: 'sj-test',
         dump: {
-          out: './dump',
+          out: './dump'
         },
         restore: {
           path: './dump/sj-test',
@@ -100,6 +102,18 @@ module.exports = function (grunt) {
     }
 
   });
+
+    // Used for delaying livereload until after server has restarted
+    grunt.registerTask('wait', function () {
+        grunt.log.ok('Waiting for server reload...');
+
+        var done = this.async();
+
+        setTimeout(function () {
+                grunt.log.writeln('Done waiting!');
+                done();
+            }, 2000);
+    });
 
   grunt.registerTask('parse', 'parsing csv data', [
     'env:local',
@@ -114,12 +128,14 @@ module.exports = function (grunt) {
     'watch'
   ]);
 
+
   grunt.registerTask('test', function(target) {
     if (target === 'parse') {
       return grunt.task.run([
-        'env:test',
-        'testbackup:restore',
-        // 'express:dev',
+        'env:local',
+//        'testbackup:restore',
+//        'express:dev',
+//        'wait',
         'mochaTest:parse'
       ]);
     }
