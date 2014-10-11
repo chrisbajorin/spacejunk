@@ -132,8 +132,8 @@ module.exports = function (grunt) {
   grunt.registerTask('test', function(target) {
     if (target === 'parse') {
       return grunt.task.run([
-        'env:local',
-//        'testbackup:restore',
+        'env:test',
+        'testbackup:restore',
 //        'express:dev',
 //        'wait',
         'mochaTest:parse'

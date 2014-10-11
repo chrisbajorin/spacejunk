@@ -1,7 +1,8 @@
-//var app = require('../../server');
-//var parser = require('../../lib/util/parser');
-////var config = require('../../lib/config/config');
-//var mongoose = require('mongoose');
+var fs = require('fs');
+var path = require('path');
+
+
+
 
 var Satellite = mongoose.model('Satellite');
 
