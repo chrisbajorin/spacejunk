@@ -47,7 +47,7 @@ db.connection.once("connected", function () {
         console.log('Express listening on port %d in %s mode', config.port, app.get('env'));
     });
 
-    app.emit('loaded');
+    app.emit('sj:appLoaded');
 
 });
 
