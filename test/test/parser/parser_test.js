@@ -18,12 +18,23 @@ ee.on('cb:countUp', function () {
 
 var Satellite = mongoose.model('Satellite');
 
+before(function(done) {
+    console.log("before: parser");
+    done();
+});
+
+after(function(done) {
+    console.log("after: parser");
+    done();
+});
+
+
 describe('Satellite insertion', function () {
 
     beforeEach(function (done) {
         Satellite.create(baseSatArray, function(err, res) {
             if (err) { console.log(err); }
-            console.log(res);
+//            console.log(res);
             done();
         });
     });
