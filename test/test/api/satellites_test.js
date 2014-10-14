@@ -14,10 +14,13 @@ describe.only("GET /api/satellites", function() {
             .expect(200)
             .end(function (err, res) {
                 should.not.exist(err);
+                res.should.be.an('object');
                 var body = res.body;
-                console.log(res);
+                body.should.be.an('array');
+                body.length.should.equal(70);
                 done();
         });
     });
+
 
 });
