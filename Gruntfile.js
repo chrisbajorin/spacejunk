@@ -1,11 +1,11 @@
-'use strict';
+"use strict";
 
 module.exports = function (grunt) {
 
-    require('load-grunt-tasks')(grunt);
+    require("load-grunt-tasks")(grunt);
 
     grunt.initConfig({
-        pkg: grunt.file.readJSON('package.json'),
+        pkg: grunt.file.readJSON("package.json"),
 
         watch: {
             options: {
@@ -15,7 +15,7 @@ module.exports = function (grunt) {
             // files:
             // }
             express: {
-                files: ['server.js', '!**/node_modules/**', '!gruntfile.js', 'lib/**'],
+                files: ["server.js", "!**/node_modules/**", "!gruntfile.js", "lib/**"],
                 tasks: ["express:dev", "wait"],
                 options: {
                     nospawn: true
@@ -25,19 +25,19 @@ module.exports = function (grunt) {
 
         jshint: {
             options: {
-                jshintrc: '.jshintrc'
+                jshintrc: ".jshintrc"
             },
             files: [
-                'gruntfile.js',
-                'lib/**/*.js',
-                'lib/*.js'
+                "gruntfile.js",
+                "lib/**/*.js",
+                "lib/*.js"
             ]
         },
 
         express: {
             dev: {
                 options: {
-                    script: 'server.js',
+                    script: "server.js",
                     debug: true
                 }
             }
@@ -46,52 +46,52 @@ module.exports = function (grunt) {
         execute: {
             parse: {
                 options: {
-                    cwd: './lib/util'
+                    cwd: "./lib/util"
                 },
-                src: ['./lib/util/parser.js']
+                src: ["./lib/util/parser.js"]
             }
         },
 
         env: {
             local: {
-                NODE_ENV: 'local'
+                NODE_ENV: "local"
             },
             test: {
-                NODE_ENV: 'test'
+                NODE_ENV: "test"
             }
         },
 
         mochaTest: {
             parse: {
                 options: {
-                    require: './test/globals/globals.js',
-                    reporter: 'spec',
+                    require: "./test/globals/globals.js",
+                    reporter: "spec",
                     colors: true,
                     timeout: 2000
                 },
-                src: ['./test/globals/spec_helper.js', './test/test/parser/*.js']
+                src: ["./test/globals/spec_helper.js", "./test/test/parser/*.js"]
             },
             api: {
                 options: {
                     require: "./test/globals/globals.js",
-                    reporter: 'spec',
+                    reporter: "spec",
                     colors: true,
                     timeout: 5000
                 },
-                src: ['./test/globals/spec_helper.js', './test/test/api/*.js']
+                src: ["./test/globals/spec_helper.js", "./test/test/api/*.js"]
             }
         },
 
         mongobackup: {
             options: {
-                host : 'localhost',
-                port: '27017',
-                db : 'sj-local',
+                host : "localhost",
+                port: "27017",
+                db : "sj-local",
                 dump: {
-                    out : './dump'
+                    out : "./dump"
                 },
                 restore:{
-                    path : './dump/sj-local',
+                    path : "./dump/sj-local",
                     drop : true
                 }
             }
@@ -99,14 +99,14 @@ module.exports = function (grunt) {
 
         testbackup: {
             options: {
-                host: 'localhost',
-                port: '27017',
-                db: 'sj-test',
+                host: "localhost",
+                port: "27017",
+                db: "sj-test",
                 dump: {
-                    out: './dump'
+                    out: "./dump"
                 },
                 restore: {
-                    path: './dump/sj-test',
+                    path: "./dump/sj-test",
                     drop: true
                 }
             }
@@ -115,39 +115,39 @@ module.exports = function (grunt) {
     });
 
     // Used for delaying livereload until after server has restarted
-    grunt.registerTask('wait', function () {
-        grunt.log.ok('Waiting for server reload...');
+    grunt.registerTask("wait", function () {
+        grunt.log.ok("Waiting for server reload...");
 
         var done = this.async();
 
         setTimeout(function () {
-            grunt.log.writeln('Done waiting!');
+            grunt.log.writeln("Done waiting!");
             done();
         }, 2000);
     });
 
-    grunt.registerTask('parse', 'parsing csv data', [
-        'env:local',
-        'express:dev',
-        'execute:parse'
+    grunt.registerTask("parse", "parsing csv data", [
+        "env:local",
+        "express:dev",
+        "execute:parse"
     ]);
 
-    grunt.registerTask('workon', 'start work on project', [
-        'jshint',
-        'env:local',
-        'express:dev',
-        'watch'
+    grunt.registerTask("workon", "start work on project", [
+        "jshint",
+        "env:local",
+        "express:dev",
+        "watch"
     ]);
 
 
-    grunt.registerTask('test', function(target) {
-        if (target === 'parse') {
+    grunt.registerTask("test", function(target) {
+        if (target === "parse") {
             return grunt.task.run([
-                'env:test',
-                'testbackup:restore',
-//        'express:dev',
-//        'wait',
-                'mochaTest:parse'
+                "env:test",
+                "testbackup:restore",
+//        "express:dev",
+//        "wait",
+                "mochaTest:parse"
             ]);
         }
         if (target === "api") {
@@ -161,22 +161,22 @@ module.exports = function (grunt) {
 
     });
 
-    grunt.registerTask('testbackup', function(task) {
+    grunt.registerTask("testbackup", function(task) {
         var done = this.async();
         var args = [];
-        var baseArgs = ['--host=localhost', '--port=27017', '--db=sj-test'];
-        var restoreArgs = ['--drop', './dump/sj-test'];
-        var dumpArgs = ['--out=./dump'];
+        var baseArgs = ["--host=localhost", "--port=27017", "--db=sj-test"];
+        var restoreArgs = ["--drop", "./dump/sj-test"];
+        var dumpArgs = ["--out=./dump"];
 
-        if (task === 'dump') {
+        if (task === "dump") {
             args = baseArgs.concat(dumpArgs);
         }
-        if (task === 'restore') {
+        if (task === "restore") {
             args = baseArgs.concat(restoreArgs);
         }
 
         grunt.util.spawn({
-                cmd: 'mongo' + task,
+                cmd: "mongo" + task,
                 args: args,
                 opts: { stdio: [ process.stdin,
                     process.stout,
