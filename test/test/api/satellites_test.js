@@ -5,20 +5,19 @@
 //
 
 
-describe("GET /api/satellites", function() {
+describe.only("GET /api/satellites", function() {
 
-    before(function(done) {
-        console.log("before: api/route");
-        done();
+
+    it("returns all satellites", function(done) {
+        var req = server.get('/api/satellites');
+        req.set('Accept', "application/json")
+            .expect(200)
+            .end(function (err, res) {
+                should.not.exist(err);
+                var body = res.body;
+                console.log(res);
+                done();
+        });
     });
-
-    after(function(done) {
-        console.log("after: api/route");
-        done();
-    });
-
-    it("runs second", function() {
-        assert.equal(1,1);
-    })
 
 });

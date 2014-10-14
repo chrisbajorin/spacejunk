@@ -16,6 +16,7 @@ module.exports = function (grunt) {
             // }
             express: {
                 files: ['server.js', '!**/node_modules/**', '!gruntfile.js', 'lib/**'],
+                tasks: ["express:dev", "wait"],
                 options: {
                     nospawn: true
                 }
@@ -66,9 +67,18 @@ module.exports = function (grunt) {
                     require: './test/globals/globals.js',
                     reporter: 'spec',
                     colors: true,
-                    timeout: 6000
+                    timeout: 2000
                 },
-                src: ['./test/globals/spec_helper.js', './test/test/**/*.js']
+                src: ['./test/globals/spec_helper.js', './test/test/parser/*.js']
+            },
+            api: {
+                options: {
+                    require: "./test/globals/globals.js",
+                    reporter: 'spec',
+                    colors: true,
+                    timeout: 5000
+                },
+                src: ['./test/globals/spec_helper.js', './test/test/api/*.js']
             }
         },
 
@@ -140,6 +150,15 @@ module.exports = function (grunt) {
                 'mochaTest:parse'
             ]);
         }
+        if (target === "api") {
+            return grunt.task.run([
+                "env:local",
+                "testbackup:restore",
+                "mochaTest:api"
+            ]);
+        }
+
+
     });
 
     grunt.registerTask('testbackup', function(task) {

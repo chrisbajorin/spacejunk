@@ -24,6 +24,7 @@ var db = mongoose.connect(config.mongo.uri, config.mongo.options);
 var app = express();
 
 db.connection.once("connected", function () {
+    console.log("connected to %s", config.mongo.uri);
 
     app.use(function (req, res, next) {
         req.config = config;
@@ -38,9 +39,9 @@ db.connection.once("connected", function () {
     require('./lib/app_routes')(app);
 
     // db logging
-//    if (app.settings.env === 'local' || app.settings.env === 'test') {
-//        mongoose.set('debug', true);
-//    }
+    if (app.settings.env === 'local' || app.settings.env === 'test') {
+        mongoose.set('debug', true);
+    }
 
     // startup
     app.listen(config.port, function () {
