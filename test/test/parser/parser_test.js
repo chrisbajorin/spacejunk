@@ -1,12 +1,12 @@
-var parser = require('../../../lib/util/parser');
+var parser = require('../../../lib/util/satparser');
 var fs = require('fs');
 var baseData = fs.readFileSync(__dirname + "/mock_base.csv", 'utf8');
 var singleSatData = fs.readFileSync(__dirname + "/mock_single.csv", "utf8");
 var updatedData = fs.readFileSync(__dirname + "/mock_update.csv", 'utf8');
 
-var baseSatArray = parser.parseCSV(baseData);
-var singleSat = parser.parseCSV(singleSatData);
-var updateSatArray = parser.parseCSV(updatedData);
+var baseSatArray = satparser.parseCSV(baseData);
+var singleSat = satparser.parseCSV(singleSatData);
+var updateSatArray = satparser.parseCSV(updatedData);
 
 var EventEmitter = require('events').EventEmitter;
 var ee = new EventEmitter();

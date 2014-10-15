@@ -48,7 +48,7 @@ module.exports = function (grunt) {
                 options: {
                     cwd: "./lib/util"
                 },
-                src: ["./lib/util/parser.js"]
+                src: ["./lib/util/satparser.js"]
             }
         },
 
