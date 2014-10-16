@@ -64,7 +64,7 @@ describe("GET /api/satellites", function() {
             });
     });
 
-    it.only("returns satellites with GTE query", function(done) {
+    it("returns satellites with GTE query", function(done) {
         var query = 'filters={"field":"inclination","value":"90","queryType":"GTE"}'
         var req = server.get('/api/satellites?' + query);
         req.set("Accept", "application/json")
@@ -79,8 +79,27 @@ describe("GET /api/satellites", function() {
                 body.length.should.equal(28);
 
                 done();
-            })
+            });
+    });
 
-    })
+    it.only("returns satellites with LTE query", function(done) {
+        var query = 'filters={"field":"inclination","value":"90","queryType":"LTE"}'
+        var req = server.get('/api/satellites?' + query);
+        req.set("Accept", "application/json")
+            .expect(200)
+            .end(function(err, res) {
+                should.not.exist(err);
+                should.exist(res);
+                res.should.be.an("object");
+
+                var body = res.body;
+                body.should.be.an('array');
+                body.length.should.equal(42);
+
+                done();
+            });
+    });
+
+
 
 });
