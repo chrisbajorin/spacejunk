@@ -45,7 +45,7 @@ describe("GET /api/satellites", function() {
     });
 
     it("returns a single satellite when queried by norad_id", function(done) {
-        var query = 'filters={"field":"norad_id","value":"' + sat.norad_id + '","queryType":"EQL"}'
+        var query = 'filters=[{"field":"norad_id","value":"' + sat.norad_id + '","queryType":"EQL"}]';
         var req = server.get('/api/satellites?' + query);
         req.set('Accept', "application/json")
             .expect(200)
@@ -65,7 +65,7 @@ describe("GET /api/satellites", function() {
     });
 
     it("returns satellites with GTE query", function(done) {
-        var query = 'filters={"field":"inclination","value":"90","queryType":"GTE"}'
+        var query = 'filters=[{"field":"inclination","value":"90","queryType":"GTE"}]';
         var req = server.get('/api/satellites?' + query);
         req.set("Accept", "application/json")
             .expect(200)
@@ -82,8 +82,8 @@ describe("GET /api/satellites", function() {
             });
     });
 
-    it.only("returns satellites with LTE query", function(done) {
-        var query = 'filters={"field":"inclination","value":"90","queryType":"LTE"}'
+    it("returns satellites with LTE query", function(done) {
+        var query = 'filters=[{"field":"inclination","value":"90","queryType":"LTE"}]';
         var req = server.get('/api/satellites?' + query);
         req.set("Accept", "application/json")
             .expect(200)
@@ -100,6 +100,24 @@ describe("GET /api/satellites", function() {
             });
     });
 
+    it("returns satellites with a multi-part query", function(done) {
+        var query = 'filters=[{"field":"inclination","value":"90","queryType":"LTE"},{"field":"raan","value":"90","queryType":"GTE"}]';
+        var req = server.get('/api/satellites?' + query);
+        req.set("Accept", "application/json")
+            .expect(200)
+            .end(function(err, res) {
+                should.not.exist(err);
+                should.exist(res);
+                res.should.be.an("object");
+
+                var body = res.body;
+//                console.log(res.body.length);
+                body.should.be.an('array');
+                body.length.should.equal(30);
+
+                done();
+            });
+    });
 
 
 });
