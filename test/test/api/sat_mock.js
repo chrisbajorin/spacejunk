@@ -1,0 +1,22 @@
+module.exports = {
+    "_id" : "54353970d24b38e288ebbfb5",
+    "name" : "FENGYUN 1C DEB",
+    "noradId" : "31084",
+    "launchDate" : "Mon Jan 25 1999",
+    "epochDate" : 2456896.5602003355,
+    "meanMotionDot" : 0.11014754,
+    "meanMotionDD" : 0,
+    "bStar" : 0.15123,
+    "inclination" : 99.4173,
+    "raan" : 180.0991,
+    "eccentricity" : 0.0052686,
+    "perigee" : 143.3361,
+    "mean_anomaly" : 217.1508,
+    "meanMotion" : 15.49911809,
+    "orbits" : 38415,
+    "constellation" : "None",
+    "constMember" : false,
+    "decayEpoch" : 0,
+    "willDecay" : false,
+    "__v" : 0
+};
