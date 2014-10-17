@@ -39,7 +39,7 @@ db.connection.once("connected", function () {
     require('./lib/app_routes')(app);
 
     // db logging
-    if (app.settings.env === 'local' || app.settings.env === 'test') {
+    if (app.settings.env === 'local'/* || app.settings.env === 'test'*/) {
         mongoose.set('debug', true);
     }
 

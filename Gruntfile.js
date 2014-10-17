@@ -152,7 +152,7 @@ module.exports = function (grunt) {
         }
         if (target === "api") {
             return grunt.task.run([
-                "env:local",
+                "env:test",
                 "testbackup:restore",
                 "mochaTest:api"
             ]);
