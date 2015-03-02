@@ -1,5 +1,5 @@
 {
-  "latedef": "nofunc",
+//  "latedef": "nofunc",
   "node": true,
   "strict": true,
   "quotmark": "double"
