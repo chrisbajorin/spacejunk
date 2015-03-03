@@ -1,22 +1,22 @@
-'use strict';
+"use strict";
 
-var express = require('express');
-var path = require('path');
-var fs = require('fs');
-var mongoose = require('mongoose');
+var express = require("express");
+var path = require("path");
+var fs = require("fs");
+var mongoose = require("mongoose");
 
-var modelsPath = path.join(__dirname, 'lib/models');
+var modelsPath = path.join(__dirname, "lib/models");
 fs.readdirSync(modelsPath).forEach(function (file) {
     if (/([a-z]+)\.(js$)/.test(file)) {
-        require(modelsPath + '/' + file);
+        require(modelsPath + "/" + file);
     }
 });
 
 // default environment
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+process.env.NODE_ENV = process.env.NODE_ENV || "development";
 
 // App config
-var config = require('./lib/config/config');
+var config = require("./lib/config/config");
 
 // db connection
 var db = mongoose.connect(config.mongo.uri, config.mongo.options);
@@ -32,23 +32,23 @@ db.connection.once("connected", function () {
     });
 
     // express settings
-    require('./lib/config/express')(app);
+    require("./lib/config/express")(app);
 
     // routes
-    require('./lib/api_routes')(app);
-    require('./lib/app_routes')(app);
+    require("./lib/api_routes")(app);
+    require("./lib/app_routes")(app);
 
     // db logging
-    if (app.settings.env === 'local'/* || app.settings.env === 'test'*/) {
-        mongoose.set('debug', true);
+    if (app.settings.env === "local"/* || app.settings.env === "test"*/) {
+        mongoose.set("debug", true);
     }
 
     // startup
     app.listen(config.port, function () {
-        console.log('Express listening on port %d in %s mode', config.port, app.get('env'));
+        console.log("Express listening on port %d in %s mode", config.port, app.get("env"));
     });
 
-    app.emit('sj:appLoaded');
+    app.emit("sj:appLoaded");
 
 });
 
