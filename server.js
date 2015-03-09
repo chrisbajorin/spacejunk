@@ -34,6 +34,10 @@ db.connection.once("connected", function () {
     // express settings
     require("./lib/config/express")(app);
 
+    // Agenda jobs
+    var scheduler = require("./lib/config/job_scheduler");
+    scheduler.initAgenda();
+
     // routes
     require("./lib/api_routes")(app);
     require("./lib/app_routes")(app);
